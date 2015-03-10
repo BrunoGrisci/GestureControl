@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 
 
@@ -34,8 +35,8 @@ public class GestureActivation extends ActionBarActivity {
         switch_flashlight = (Switch) findViewById(R.id.switch_flashlight);
 
         loadSwitchStatus();
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

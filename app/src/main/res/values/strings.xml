@@ -15,4 +15,15 @@
     <string name="switch_mute_notifications">Mute notifications</string>
     <string name="switch_flashlight">Turn on/off flashlight</string>
 
+    <string name="button_volume_increase">+</string>
+    <string name="button_volume_decrese">-</string>
+    <string name="button_volume">Volume</string>
+    <string name="button_camera">Launch camera</string>
+    <string name="button_phone">Launch phone</string>
+    <string name="button_contact">Call contact</string>
+    <string name="button_navigation">Go to place</string>
+    <string name="button_twitter">Post localization on Twitter</string>
+    <string name="button_mute_notifications">Mute notifications</string>
+    <string name="button_flashlight">Turn on/off flashlight</string>
+
 </resources>
