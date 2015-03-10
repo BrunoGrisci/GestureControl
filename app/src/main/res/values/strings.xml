@@ -26,4 +26,6 @@
     <string name="button_mute_notifications">Mute notifications</string>
     <string name="button_flashlight">Turn on/off flashlight</string>
 
+    <string name="flashlight_available">No flashlight available.</string>
+
 </resources>

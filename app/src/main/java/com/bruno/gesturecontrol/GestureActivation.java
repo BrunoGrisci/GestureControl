@@ -1,12 +1,14 @@
 package com.bruno.gesturecontrol;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 
 public class GestureActivation extends ActionBarActivity {
@@ -24,6 +26,10 @@ public class GestureActivation extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gesture_activation);
+
+        if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.flashlight_available), Toast.LENGTH_SHORT).show();
+        }
 
         switch_volume = (Switch) findViewById(R.id.switch_volume);
         switch_camera = (Switch) findViewById(R.id.switch_camera);
@@ -97,6 +103,13 @@ public class GestureActivation extends ActionBarActivity {
         switch_navigation.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false));
         switch_twitter.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false));
         switch_mute_notifications.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));
-        switch_flashlight.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
+
+        if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            switch_flashlight.setEnabled(false);
+            switch_flashlight.setChecked(false);
+        }
+        else {
+            switch_flashlight.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
+        }
     }
 }
