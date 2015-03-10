@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Gesture Control</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_gesture_activation">GestureActivation</string>
+    <string name="title_activity_commands">Commands</string>
+
+    <string name="switch_volume">Increase/Decrease volume</string>
+    <string name="switch_camera">Launch camera</string>
+    <string name="switch_phone">Launch phone</string>
+    <string name="switch_contact">Call contact</string>
+    <string name="switch_navigation">Go to place</string>
+    <string name="switch_twitter">Post localization on Twitter</string>
+    <string name="switch_mute_notifications">Mute notifications</string>
+    <string name="switch_flashlight">Turn on/off flashlight</string>
+
+</resources>
