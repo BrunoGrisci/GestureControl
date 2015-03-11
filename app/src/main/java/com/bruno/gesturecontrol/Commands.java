@@ -1,14 +1,15 @@
 package com.bruno.gesturecontrol;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
 
 public class Commands extends ActionBarActivity {
 
@@ -86,11 +87,21 @@ public class Commands extends ActionBarActivity {
         button_twitter.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false));
         button_mute_notifications.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));
         button_flashlight.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
+
+        switch(savedSwitchStatus.getInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL)){
+            case AudioManager.RINGER_MODE_NORMAL:
+                button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                break;
+        }
     }
 
     public void increaseVolume (View v) {
-        System.out.println("+");
-
         AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -100,7 +111,6 @@ public class Commands extends ActionBarActivity {
     }
 
     public void decreaseVolume (View v) {
-        System.out.println("-");
         AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -110,19 +120,34 @@ public class Commands extends ActionBarActivity {
     }
 
     public void launchCamera (View v) {
-        System.out.println("camera");
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void launchPhone(View v) {
-        System.out.println("phone");
+        Intent intent = new Intent(Intent.ACTION_DIAL, null);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void callContact(View v) {
-        System.out.println("contact");
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:955538002"));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void goToPlace(View v) {
-        System.out.println("navigation");
+        Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4194");
+        Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void postTwitter(View v) {
@@ -130,7 +155,37 @@ public class Commands extends ActionBarActivity {
     }
 
     public void muteNotifications(View v) {
-        System.out.println("notifications");
+
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedSwitchStatus.edit();
+
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode() ){
+            case AudioManager.RINGER_MODE_NORMAL:
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_SILENT);
+                editor.commit();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
+                editor.commit();
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
+                editor.commit();
+                break;
+        }
     }
 
     public void turnFlashlight(View v) {

@@ -1,12 +1,12 @@
 package com.bruno.gesturecontrol;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -28,7 +28,11 @@ public class GestureActivation extends ActionBarActivity {
         setContentView(R.layout.activity_gesture_activation);
 
         if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.flashlight_available), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_flashlight_available), Toast.LENGTH_SHORT).show();
+        }
+
+        if (!isCameraAvailable(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_camera_available), Toast.LENGTH_SHORT).show();
         }
 
         switch_volume = (Switch) findViewById(R.id.switch_volume);
@@ -77,7 +81,12 @@ public class GestureActivation extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         saveSwitchStatus();
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveSwitchStatus();
     }
 
     protected void saveSwitchStatus() {
@@ -97,13 +106,18 @@ public class GestureActivation extends ActionBarActivity {
     protected void loadSwitchStatus() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         switch_volume.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false));
-        switch_camera.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false));
+        if (!isCameraAvailable(getApplicationContext())) {
+            switch_camera.setEnabled(false);
+            switch_camera.setChecked(false);
+        }
+        else {
+            switch_camera.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false));
+        }
         switch_phone.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false));
         switch_contact.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false));
         switch_navigation.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false));
         switch_twitter.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false));
         switch_mute_notifications.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));
-
         if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
             switch_flashlight.setEnabled(false);
             switch_flashlight.setChecked(false);
@@ -112,4 +126,10 @@ public class GestureActivation extends ActionBarActivity {
             switch_flashlight.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
         }
     }
+
+    public static boolean isCameraAvailable(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
+    }
+
 }

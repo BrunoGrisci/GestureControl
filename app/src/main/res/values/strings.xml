@@ -24,8 +24,10 @@
     <string name="button_navigation">Go to place</string>
     <string name="button_twitter">Post localization on Twitter</string>
     <string name="button_mute_notifications">Mute notifications</string>
+    <string name="button_unmute_notifications">Unmute notifications</string>
     <string name="button_flashlight">Turn on/off flashlight</string>
 
-    <string name="flashlight_available">No flashlight available.</string>
+    <string name="no_flashlight_available">No flashlight available.</string>
+    <string name="no_camera_available">No camera available.</string>
 
 </resources>
