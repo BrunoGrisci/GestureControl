@@ -21,8 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/button_volume_decrese"
-                android:id="@+id/button_volume_decrease"
-                android:onClick="decreaseVolume"/>
+                android:id="@+id/button_volume_decrease"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -35,8 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/button_volume_increase"
-                android:id="@+id/button_volume_increase"
-                android:onClick="increaseVolume"/>
+                android:id="@+id/button_volume_increase"/>
         </LinearLayout>
 
         <Button
@@ -44,55 +42,48 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_camera"
-            android:id="@+id/button_camera"
-            android:onClick="launchCamera"/>
+            android:id="@+id/button_camera"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_phone"
-            android:id="@+id/button_phone"
-            android:onClick="launchPhone"/>
+            android:id="@+id/button_phone"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_contact"
-            android:id="@+id/button_contact"
-            android:onClick="callContact"/>
+            android:id="@+id/button_contact"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_navigation"
-            android:id="@+id/button_navigation"
-            android:onClick="goToPlace"/>
+            android:id="@+id/button_navigation"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_twitter"
-            android:id="@+id/button_twitter"
-            android:onClick="postTwitter"/>
+            android:id="@+id/button_twitter"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_mute_notifications"
-            android:id="@+id/button_mute_notifications"
-            android:onClick="muteNotifications"/>
+            android:id="@+id/button_mute_notifications"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="@string/button_flashlight"
-            android:id="@+id/button_flashlight"
-            android:onClick="turnFlashlight"/>
+            android:id="@+id/button_flashlight"/>
     </LinearLayout>
 </RelativeLayout>

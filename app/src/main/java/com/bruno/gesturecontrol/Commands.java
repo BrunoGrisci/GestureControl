@@ -1,7 +1,10 @@
 package com.bruno.gesturecontrol;
 
+import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
@@ -37,6 +40,61 @@ public class Commands extends ActionBarActivity {
         button_twitter = (Button) findViewById(R.id.button_twitter);
         button_mute_notifications = (Button) findViewById(R.id.button_mute_notifications);
         button_flashlight = (Button) findViewById(R.id.button_flashlight);
+
+        button_volume_increase.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                increaseVolume(getApplicationContext());
+            }
+        });
+
+        button_volume_decrease.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                decreaseVolume(getApplicationContext());
+            }
+        });
+
+        button_camera.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                launchCamera();
+            }
+        });
+
+        button_phone.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                launchPhone();
+            }
+        });
+
+        button_contact.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                callContact();
+            }
+        });
+
+        button_navigation.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToPlace();
+            }
+        });
+
+        button_twitter.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                postTwitter();
+            }
+        });
+
+        button_mute_notifications.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                muteNotifications(getApplicationContext());
+            }
+        });
+
+        button_flashlight.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                turnFlashlight();
+            }
+        });
+
 
         loadButtons();
     }
@@ -101,8 +159,8 @@ public class Commands extends ActionBarActivity {
         }
     }
 
-    public void increaseVolume (View v) {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+    public void increaseVolume (Context context) {
+        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -110,8 +168,8 @@ public class Commands extends ActionBarActivity {
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
     }
 
-    public void decreaseVolume (View v) {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+    public void decreaseVolume (Context context) {
+        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -119,21 +177,21 @@ public class Commands extends ActionBarActivity {
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
     }
 
-    public void launchCamera (View v) {
+    public void launchCamera () {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
     }
 
-    public void launchPhone(View v) {
+    public void launchPhone() {
         Intent intent = new Intent(Intent.ACTION_DIAL, null);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
     }
 
-    public void callContact(View v) {
+    public void callContact() {
         Intent intent = new Intent(Intent.ACTION_CALL);
         intent.setData(Uri.parse("tel:955538002"));
         if (intent.resolveActivity(getPackageManager()) != null) {
@@ -141,7 +199,7 @@ public class Commands extends ActionBarActivity {
         }
     }
 
-    public void goToPlace(View v) {
+    public void goToPlace() {
         Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4194");
         Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         intent.setPackage("com.google.android.apps.maps");
@@ -150,16 +208,16 @@ public class Commands extends ActionBarActivity {
         }
     }
 
-    public void postTwitter(View v) {
+    public void postTwitter() {
         System.out.println("twitter");
     }
 
-    public void muteNotifications(View v) {
+    public void muteNotifications(Context context) {
 
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         SharedPreferences.Editor editor = savedSwitchStatus.edit();
 
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         switch(audioManager.getRingerMode() ){
             case AudioManager.RINGER_MODE_NORMAL:
                 audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
@@ -188,7 +246,13 @@ public class Commands extends ActionBarActivity {
         }
     }
 
-    public void turnFlashlight(View v) {
+    public void turnFlashlight() {
         System.out.println("flashlight");
+        Camera cam = Camera.open();
+        Camera.Parameters p = cam.getParameters();
+        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        cam.setParameters(p);
+        cam.startPreview();
     }
+
 }
