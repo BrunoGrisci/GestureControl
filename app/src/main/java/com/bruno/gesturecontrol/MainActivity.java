@@ -11,16 +11,11 @@ import android.view.MotionEvent;
 import android.widget.TabHost;
 
 
-public class MainActivity extends TabActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener{
-
-    private GestureDetectorCompat mDetector;
+public class MainActivity extends TabActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDetector = new GestureDetectorCompat(this,this);
-        mDetector.setOnDoubleTapListener(this);
 
         //It creates the tabs
         TabHost mTabHost = getTabHost();
@@ -59,62 +54,4 @@ public class MainActivity extends TabActivity implements GestureDetector.OnGestu
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event){
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onDown(MotionEvent event) {
-        System.out.println(event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-        System.out.println("onFling: " + event1.toString() + event2.toString());
-        return true;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent event) {
-        System.out.println("onLongPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
-        System.out.println("onScroll: " + e1.toString() + e2.toString());
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent event) {
-        System.out.println("onShowPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event) {
-        System.out.println("onSingleTapUp: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-        System.out.println("onDoubleTap: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        System.out.println("onDoubleTapEvent: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        System.out.println("onSingleTapConfirmed: " + event.toString());
-        return true;
-    }
 }

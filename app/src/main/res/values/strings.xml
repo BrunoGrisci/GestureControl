@@ -29,5 +29,6 @@
 
     <string name="no_flashlight_available">No flashlight available.</string>
     <string name="no_camera_available">No camera available.</string>
+    <string name="title_activity_transparent_layout">TransparentLayout</string>
 
 </resources>

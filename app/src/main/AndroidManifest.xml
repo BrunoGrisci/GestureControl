@@ -43,6 +43,13 @@
             android:name=".GestureFunctions"
             android:exported="false" >
         </service>
+
+        <activity
+            android:name=".TransparentLayout"
+            android:label="@string/title_activity_transparent_layout"
+            android:theme="@style/Theme.AppCompat.NoActionBar.Translucent"
+            android:launchMode="singleInstance">
+        </activity>
     </application>
 
 </manifest>

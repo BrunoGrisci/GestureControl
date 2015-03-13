@@ -1,8 +1,10 @@
 package com.bruno.gesturecontrol;
 
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
@@ -92,11 +94,10 @@ public class Commands extends ActionBarActivity {
 
         button_mute_notifications.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
                 muteNotifications(getApplicationContext());
-                //button_mute_notifications.setEnabled(false);
+                button_mute_notifications.setEnabled(false);
                 //GestureFunctions.startActionMuteNotifications(getApplicationContext());
-                //button_mute_notifications.setEnabled(true);
+                AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
                 switch(audioManager.getRingerMode()){
                     case AudioManager.RINGER_MODE_NORMAL:
                         button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
@@ -108,6 +109,7 @@ public class Commands extends ActionBarActivity {
                         button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
                         break;
                 }
+                button_mute_notifications.setEnabled(true);
             }
         });
 

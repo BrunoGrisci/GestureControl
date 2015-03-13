@@ -2,6 +2,7 @@ package com.bruno.gesturecontrol;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.view.Gravity;
@@ -28,8 +29,6 @@ public class FloatingButtonService extends Service {
     @Override public void onCreate() {
         super.onCreate();
 
-        System.out.println("head");
-
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         chatHead = new ImageView(this);
@@ -54,6 +53,8 @@ public class FloatingButtonService extends Service {
             private float initialTouchX;
             private float initialTouchY;
 
+            boolean isClick = false;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -62,14 +63,21 @@ public class FloatingButtonService extends Service {
                         initialY = params.y;
                         initialTouchX = event.getRawX();
                         initialTouchY = event.getRawY();
+                        isClick = true;
                         return true;
                     case MotionEvent.ACTION_UP:
-                        System.out.println("POW");
+                        if (isClick) {
+                            Intent intent = new Intent(getBaseContext(), TransparentLayout.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getBaseContext().startActivity(intent);
+                            isClick = false;
+                        }
                         return true;
                     case MotionEvent.ACTION_MOVE:
                         params.x = initialX + (int) (event.getRawX() - initialTouchX);
                         params.y = initialY + (int) (event.getRawY() - initialTouchY);
                         windowManager.updateViewLayout(chatHead, params);
+                        isClick = false;
                         return true;
                 }
                 return false;
