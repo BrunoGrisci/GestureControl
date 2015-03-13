@@ -2,6 +2,8 @@ package com.bruno.gesturecontrol;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;

@@ -3,6 +3,7 @@ package com.bruno.gesturecontrol;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -157,11 +158,14 @@ public class GestureFunctions extends IntentService {
      * parameters.
      */
     private void handleActionIncreaseVolume() {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false)) {
+            AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        }
     }
 
     /**
@@ -169,79 +173,103 @@ public class GestureFunctions extends IntentService {
      * parameters.
      */
     private void handleActionDecreaseVolume() {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false)) {
+            AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        }
     }
 
     private void handleActionLaunchCamera() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false)) {
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
     }
 
     private void handleActionLaunchPhone() {
-        Intent intent = new Intent(Intent.ACTION_DIAL, null);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false)) {
+            Intent intent = new Intent(Intent.ACTION_DIAL, null);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
     }
 
     private void handleActionCallContact(String tel) {
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse(tel));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false)) {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse(tel));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
     }
 
     private void handleActionNavigate(String coord) {
-        Uri gmmIntentUri = Uri.parse(coord);
-        Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        intent.setPackage("com.google.android.apps.maps");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false)) {
+            Uri gmmIntentUri = Uri.parse(coord);
+            Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            intent.setPackage("com.google.android.apps.maps");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
     }
 
     private void handleActionPostTwitter() {
-        System.out.println("twitter");
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
+            System.out.println("twitter");
+        }
     }
 
     private void handleActionMuteNotifications() {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
-        switch(audioManager.getRingerMode() ){
-            case AudioManager.RINGER_MODE_NORMAL:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                break;
-            case AudioManager.RINGER_MODE_SILENT:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
-            case AudioManager.RINGER_MODE_VIBRATE:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
+            AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            switch (audioManager.getRingerMode()) {
+                case AudioManager.RINGER_MODE_NORMAL:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    break;
+                case AudioManager.RINGER_MODE_SILENT:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    break;
+                case AudioManager.RINGER_MODE_VIBRATE:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    break;
+            }
         }
     }
 
     private void handleActionTurnFlashlight() {
-        System.out.println("flashlight");
-        Camera cam = Camera.open();
-        Camera.Parameters p = cam.getParameters();
-        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        cam.setParameters(p);
-        cam.startPreview();
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
+            System.out.println("flashlight");
+            Camera cam = Camera.open();
+            Camera.Parameters p = cam.getParameters();
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            cam.setParameters(p);
+            cam.startPreview();
+        }
     }
 }

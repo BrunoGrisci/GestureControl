@@ -66,11 +66,12 @@ public class TransparentLayout extends ActionBarActivity implements GestureDetec
     @Override
     public void onLongPress(MotionEvent event) {
         System.out.println("onLongPress: " + event.toString());
+        GestureFunctions.startActionLaunchPhone(getApplicationContext());
+        killActivity();
     }
 
     @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         System.out.println("onScroll: " + e1.toString() + e2.toString());
         return true;
     }
@@ -95,6 +96,8 @@ public class TransparentLayout extends ActionBarActivity implements GestureDetec
     @Override
     public boolean onDoubleTapEvent(MotionEvent event) {
         System.out.println("onDoubleTapEvent: " + event.toString());
+        GestureFunctions.startActionLaunchCamera(getApplicationContext());
+        killActivity();
         return true;
     }
 
@@ -102,5 +105,10 @@ public class TransparentLayout extends ActionBarActivity implements GestureDetec
     public boolean onSingleTapConfirmed(MotionEvent event) {
         System.out.println("onSingleTapConfirmed: " + event.toString());
         return true;
+    }
+
+    public void killActivity()
+    {
+        finish();
     }
 }
