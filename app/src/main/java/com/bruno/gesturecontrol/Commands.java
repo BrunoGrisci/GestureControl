@@ -43,68 +43,69 @@ public class Commands extends ActionBarActivity {
 
         button_volume_increase.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                increaseVolume(getApplicationContext());
+                //increaseVolume(getApplicationContext());
+                GestureFunctions.startActionIncreaseVolume(getApplicationContext());
             }
         });
 
         button_volume_decrease.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                decreaseVolume(getApplicationContext());
+                //decreaseVolume(getApplicationContext());
+                GestureFunctions.startActionDecreaseVolume(getApplicationContext());
             }
         });
 
         button_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                launchCamera();
+                //launchCamera();
+                GestureFunctions.startActionLaunchCamera(getApplicationContext());
             }
         });
 
         button_phone.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                launchPhone();
+                //launchPhone();
+                GestureFunctions.startActionLaunchPhone(getApplicationContext());
             }
         });
 
         button_contact.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                callContact();
+                //callContact();
+               GestureFunctions.startActionCallContact(getApplicationContext(), "tel:955538002");
             }
         });
 
         button_navigation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToPlace();
+                //goToPlace();
+                GestureFunctions.startActionNavigate(getApplicationContext(), "geo:37.7749,-122.4194");
             }
         });
 
         button_twitter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                postTwitter();
+                //postTwitter();
+                GestureFunctions.startActionPostTwitter(getApplicationContext());
             }
         });
 
         button_mute_notifications.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-                SharedPreferences.Editor editor = savedSwitchStatus.edit();
                 AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
-
-                muteNotifications(audioManager);
+                muteNotifications(getApplicationContext());
+                //button_mute_notifications.setEnabled(false);
+                //GestureFunctions.startActionMuteNotifications(getApplicationContext());
+                //button_mute_notifications.setEnabled(true);
                 switch(audioManager.getRingerMode()){
                     case AudioManager.RINGER_MODE_NORMAL:
                         button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
-                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_SILENT);
-                        //editor.commit();
                         break;
                     case AudioManager.RINGER_MODE_SILENT:
                         button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
-                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
-                        //editor.commit();
                         break;
                     case AudioManager.RINGER_MODE_VIBRATE:
                         button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
-                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
-                        //editor.commit();
                         break;
                 }
             }
@@ -112,7 +113,8 @@ public class Commands extends ActionBarActivity {
 
         button_flashlight.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                turnFlashlight();
+                //turnFlashlight();
+                GestureFunctions.startActionTurnFlashlight(getApplicationContext());
             }
         });
 
@@ -182,17 +184,17 @@ public class Commands extends ActionBarActivity {
 
     public void increaseVolume (Context context) {
         AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
     }
 
     public void decreaseVolume (Context context) {
         AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
     }
 
@@ -231,8 +233,8 @@ public class Commands extends ActionBarActivity {
         System.out.println("twitter");
     }
 
-    public void muteNotifications(AudioManager audioManager) {
-
+    public void muteNotifications(Context context) {
+        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         switch(audioManager.getRingerMode() ){
             case AudioManager.RINGER_MODE_NORMAL:
                 audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);

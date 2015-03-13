@@ -8,9 +8,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.maret.maps.permission.MAPS_RECEIVE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <permission android:name="android.permission.FLASHLIGHT"
+    <permission
+        android:name="android.permission.FLASHLIGHT"
         android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
         android:protectionLevel="normal" />
 
@@ -36,7 +37,12 @@
             android:name=".Commands"
             android:label="@string/title_activity_commands" >
         </activity>
+
         <service android:name=".FloatingButtonService" />
+        <service
+            android:name=".GestureFunctions"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
