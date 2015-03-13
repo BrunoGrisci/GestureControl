@@ -85,7 +85,28 @@ public class Commands extends ActionBarActivity {
 
         button_mute_notifications.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                muteNotifications(getApplicationContext());
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                SharedPreferences.Editor editor = savedSwitchStatus.edit();
+                AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+
+                muteNotifications(audioManager);
+                switch(audioManager.getRingerMode()){
+                    case AudioManager.RINGER_MODE_NORMAL:
+                        button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_SILENT);
+                        //editor.commit();
+                        break;
+                    case AudioManager.RINGER_MODE_SILENT:
+                        button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
+                        //editor.commit();
+                        break;
+                    case AudioManager.RINGER_MODE_VIBRATE:
+                        button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                        //editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
+                        //editor.commit();
+                        break;
+                }
             }
         });
 
@@ -94,7 +115,6 @@ public class Commands extends ActionBarActivity {
                 turnFlashlight();
             }
         });
-
 
         loadButtons();
     }
@@ -146,7 +166,8 @@ public class Commands extends ActionBarActivity {
         button_mute_notifications.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));
         button_flashlight.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
 
-        switch(savedSwitchStatus.getInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL)){
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode() ){
             case AudioManager.RINGER_MODE_NORMAL:
                 button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
                 break;
@@ -162,7 +183,6 @@ public class Commands extends ActionBarActivity {
     public void increaseVolume (Context context) {
         AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -171,7 +191,6 @@ public class Commands extends ActionBarActivity {
     public void decreaseVolume (Context context) {
         AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
@@ -212,36 +231,23 @@ public class Commands extends ActionBarActivity {
         System.out.println("twitter");
     }
 
-    public void muteNotifications(Context context) {
+    public void muteNotifications(AudioManager audioManager) {
 
-        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-        SharedPreferences.Editor editor = savedSwitchStatus.edit();
-
-        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
         switch(audioManager.getRingerMode() ){
             case AudioManager.RINGER_MODE_NORMAL:
                 audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
                 audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_SILENT);
-                editor.commit();
                 break;
             case AudioManager.RINGER_MODE_SILENT:
                 audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
                 audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
-                editor.commit();
                 break;
             case AudioManager.RINGER_MODE_VIBRATE:
                 audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
                 audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                editor.putInt(getResources().getString(R.string.button_unmute_notifications), AudioManager.RINGER_MODE_NORMAL);
-                editor.commit();
                 break;
         }
     }

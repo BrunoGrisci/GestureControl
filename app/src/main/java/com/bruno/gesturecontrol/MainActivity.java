@@ -27,8 +27,15 @@ public class MainActivity extends TabActivity implements GestureDetector.OnGestu
         mTabHost.addTab(mTabHost.newTabSpec("first").setIndicator("Gesture activation").setContent(new Intent(this, GestureActivation.class )));
         mTabHost.addTab(mTabHost.newTabSpec("second").setIndicator("Commands").setContent(new Intent(this, Commands.class )));
         mTabHost.setCurrentTab(0);
+
+        startService(new Intent(getApplicationContext(), FloatingButtonService.class));
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(getApplicationContext(), FloatingButtonService.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
