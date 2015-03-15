@@ -22,12 +22,13 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     private GestureDetectorCompat mDetector;
     private GestureLibrary mLibrary;
 
-    private final String GESTURE_ARROW_RIGHT = "ARROW_RIGHT";
-    private final String GESTURE_ARROW_UP = "ARROW_UP";
     private final String GESTURE_CHECK_MARK = "CHECK_MARK";
     private final String GESTURE_CIRCULAR_CLOCKWISE = "CIRCULAR_CLOCKWISE";
     private final String GESTURE_CIRCULAR_COUNTERCLOCKWISE = "CIRCULAR_COUNTERCLOCKWISE";
     private final String GESTURE_HEART = "HEART";
+    private final String GESTURE_TRIANGLE = "TRIANGLE";
+
+    private final double SCORE_THRESHOLD = 2.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
 
         mLibrary = GestureLibraries.fromRawResource(this, R.raw.gestures);
         if (!mLibrary.load()) {
-            finish();
+            killActivity();
         }
 
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.gestures);
@@ -71,16 +72,35 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
         ArrayList<Prediction> predictions = mLibrary.recognize(gesture);
 
-        if (predictions.size() > 0 && predictions.get(0).score > 1.0) {
+        if (predictions.size() > 0 && predictions.get(0).score > SCORE_THRESHOLD) {
             String result = predictions.get(0).name;
+            double score = predictions.get(0).score;
 
-            if ("arrow".equalsIgnoreCase(result)) {
-                Toast.makeText(this, "arrow", Toast.LENGTH_LONG).show();
-                killActivity();
-            } else if ("check_mark".equalsIgnoreCase(result)) {
-                Toast.makeText(this, "check_mark", Toast.LENGTH_LONG).show();
+            if (GESTURE_CHECK_MARK.equalsIgnoreCase(result) && score > 5.0) {
+                GestureFunctions.startActionPostTwitter(getApplicationContext());
                 killActivity();
             }
+            else if (GESTURE_CIRCULAR_CLOCKWISE.equalsIgnoreCase(result) && score > 3.0) {
+                GestureFunctions.startActionIncreaseVolume(getApplicationContext());
+                killActivity();
+            }
+            else if (GESTURE_CIRCULAR_COUNTERCLOCKWISE.equalsIgnoreCase(result) && score > 3.0) {
+                GestureFunctions.startActionDecreaseVolume(getApplicationContext());
+                killActivity();
+            }
+            else if (GESTURE_HEART.equalsIgnoreCase(result)) {
+                GestureFunctions.startActionCallContact(getApplicationContext(), "tel:955538002");
+                killActivity();
+            }
+            else if (GESTURE_TRIANGLE.equalsIgnoreCase(result)) {
+                GestureFunctions.startActionNavigate(getApplicationContext(), "geo:37.7749,-122.4194");
+                killActivity();
+            }
+            else {
+                Toast.makeText(this, "Gesture not recognized", Toast.LENGTH_SHORT).show();
+                killActivity();
+            }
+
         }
     }
 
@@ -150,6 +170,8 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     @Override
     public boolean onSingleTapConfirmed(MotionEvent event) {
         System.out.println("onSingleTapConfirmed: " + event.toString());
+        Toast.makeText(this, "Gesture not recognized", Toast.LENGTH_SHORT).show();
+        killActivity();
         return true;
     }
 

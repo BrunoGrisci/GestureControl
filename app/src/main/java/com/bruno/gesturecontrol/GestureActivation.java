@@ -1,17 +1,27 @@
 package com.bruno.gesturecontrol;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.Toast;
 
 
 public class GestureActivation extends ActionBarActivity {
+
+    private final int PICK_CONTACT = 15;
 
     Switch switch_volume;
     Switch switch_camera;
@@ -21,6 +31,9 @@ public class GestureActivation extends ActionBarActivity {
     Switch switch_twitter;
     Switch switch_mute_notifications;
     Switch switch_flashlight;
+
+    Button button_select_contact;
+    Button button_select_navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +47,20 @@ public class GestureActivation extends ActionBarActivity {
         if (!isCameraAvailable(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_camera_available), Toast.LENGTH_SHORT).show();
         }
+
+        button_select_contact = (Button) findViewById(R.id.button_contact_selection);
+        button_select_contact.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+            }
+        });
+
+        button_select_navigation = (Button) findViewById(R.id.button_navigation_selection);
+        button_select_navigation.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+            }
+        });
 
         switch_volume = (Switch) findViewById(R.id.switch_volume);
         switch_camera = (Switch) findViewById(R.id.switch_camera);

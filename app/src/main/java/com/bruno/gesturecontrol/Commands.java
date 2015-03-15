@@ -95,7 +95,6 @@ public class Commands extends ActionBarActivity {
         button_mute_notifications.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 muteNotifications(getApplicationContext());
-                button_mute_notifications.setEnabled(false);
                 //GestureFunctions.startActionMuteNotifications(getApplicationContext());
                 AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
                 switch(audioManager.getRingerMode()){
@@ -109,7 +108,6 @@ public class Commands extends ActionBarActivity {
                         button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
                         break;
                 }
-                button_mute_notifications.setEnabled(true);
             }
         });
 
