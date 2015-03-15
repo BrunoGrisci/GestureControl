@@ -1,5 +1,10 @@
 package com.bruno.gesturecontrol;
 
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -7,11 +12,22 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
-public class TransparentLayout extends ActionBarActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class TransparentLayout extends ActionBarActivity implements GestureOverlayView.OnGesturePerformedListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     private GestureDetectorCompat mDetector;
+    private GestureLibrary mLibrary;
+
+    private final String GESTURE_ARROW_RIGHT = "ARROW_RIGHT";
+    private final String GESTURE_ARROW_UP = "ARROW_UP";
+    private final String GESTURE_CHECK_MARK = "CHECK_MARK";
+    private final String GESTURE_CIRCULAR_CLOCKWISE = "CIRCULAR_CLOCKWISE";
+    private final String GESTURE_CIRCULAR_COUNTERCLOCKWISE = "CIRCULAR_COUNTERCLOCKWISE";
+    private final String GESTURE_HEART = "HEART";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +36,15 @@ public class TransparentLayout extends ActionBarActivity implements GestureDetec
 
         mDetector = new GestureDetectorCompat(this,this);
         mDetector.setOnDoubleTapListener(this);
-    }
 
+        mLibrary = GestureLibraries.fromRawResource(this, R.raw.gestures);
+        if (!mLibrary.load()) {
+            finish();
+        }
+
+        GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.gestures);
+        gestures.addOnGesturePerformedListener(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -43,6 +66,29 @@ public class TransparentLayout extends ActionBarActivity implements GestureDetec
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+        ArrayList<Prediction> predictions = mLibrary.recognize(gesture);
+
+        if (predictions.size() > 0 && predictions.get(0).score > 1.0) {
+            String result = predictions.get(0).name;
+
+            if ("arrow".equalsIgnoreCase(result)) {
+                Toast.makeText(this, "arrow", Toast.LENGTH_LONG).show();
+                killActivity();
+            } else if ("check_mark".equalsIgnoreCase(result)) {
+                Toast.makeText(this, "check_mark", Toast.LENGTH_LONG).show();
+                killActivity();
+            }
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event)
+    {
+        this.mDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
     @Override
