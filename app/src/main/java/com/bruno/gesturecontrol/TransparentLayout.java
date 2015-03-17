@@ -97,11 +97,13 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                 killActivity();
             }
             else if (GESTURE_TRIANGLE.equalsIgnoreCase(result)) {
-                GestureFunctions.startActionNavigate(getApplicationContext(), "geo:37.7749,-122.4194");
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                String coord = savedSwitchStatus.getString("locationCoord", "geo:37.7749,-122.4194");
+                GestureFunctions.startActionNavigate(getApplicationContext(), coord);
                 killActivity();
             }
             else {
-                Toast.makeText(this, "Gesture not recognized", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.gesture_not_recognized), Toast.LENGTH_SHORT).show();
                 killActivity();
             }
 

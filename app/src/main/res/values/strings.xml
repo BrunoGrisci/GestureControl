@@ -30,11 +30,20 @@
     <string name="button_contact_selection">Select</string>
     <string name="button_navigation_select">Select</string>
 
+    <string name="label_name_location">NAME</string>
+    <string name="button_save_location">SAVE</string>
+
     <string name="no_flashlight_available">No flashlight available.</string>
     <string name="no_camera_available">No camera available.</string>
     <string name="title_activity_transparent_layout">TransparentLayout</string>
 
+    <string name="gesture_not_recognized">Gesture not recognized</string>
     <string name="gesture_disabled">This gesture was disabled.</string>
     <string name="no_phone">has no phone associated.</string>
+    <string name="title_activity_location_selector">LocationSelector</string>
+
+    <string name="name_first_message">Give a name before saving</string>
+    <string name="unknown_address">Unknown address</string>
+    unknown_address
 
 </resources>

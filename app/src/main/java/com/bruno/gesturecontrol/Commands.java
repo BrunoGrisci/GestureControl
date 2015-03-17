@@ -223,7 +223,9 @@ public class Commands extends ActionBarActivity {
     }
 
     public void goToPlace() {
-        Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4194");
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        String coord = savedSwitchStatus.getString("locationCoord", "geo:37.7749,-122.4194");
+        Uri gmmIntentUri = Uri.parse(coord);
         Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         intent.setPackage("com.google.android.apps.maps");
         if (intent.resolveActivity(getPackageManager()) != null) {

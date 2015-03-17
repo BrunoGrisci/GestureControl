@@ -23,18 +23,19 @@ import android.widget.Toast;
 public class GestureActivation extends ActionBarActivity {
 
     private final int PICK_CONTACT = 15;
+    private final int PICK_LOCATION_REQUEST = 17;
 
-    static Switch switch_volume;
-    static Switch switch_camera;
-    static Switch switch_phone;
-    static Switch switch_contact;
-    static Switch switch_navigation;
-    static Switch switch_twitter;
-    static Switch switch_mute_notifications;
-    static Switch switch_flashlight;
+    Switch switch_volume;
+    Switch switch_camera;
+    Switch switch_phone;
+    Switch switch_contact;
+    Switch switch_navigation;
+    Switch switch_twitter;
+    Switch switch_mute_notifications;
+    Switch switch_flashlight;
 
-    static Button button_select_contact;
-    static Button button_select_navigation;
+    Button button_select_contact;
+    Button button_select_navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class GestureActivation extends ActionBarActivity {
         button_select_navigation = (Button) findViewById(R.id.button_navigation_selection);
         button_select_navigation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), LocationSelector.class);
+                startActivityForResult(intent, PICK_LOCATION_REQUEST);
             }
         });
 
@@ -156,6 +158,18 @@ public class GestureActivation extends ActionBarActivity {
                     c.close();
                 }
                 break;
+            case (PICK_LOCATION_REQUEST) :
+                // Make sure the request was successful
+                if (resultCode == RESULT_OK) {
+                    Double latitude = data.getDoubleExtra("latitude", 0.0);
+                    Double longitude = data.getDoubleExtra("longitude", 0.0);
+                    String name = data.getStringExtra("name");
+                    saveLocation(name, latitude, longitude);
+                }
+                break;
+            case (RESULT_CANCELED) :
+                System.out.println("CANCELED");
+                break;
         }
     }
 
@@ -182,6 +196,15 @@ public class GestureActivation extends ActionBarActivity {
         button_select_contact.setText(name);
     }
 
+    public void saveLocation(String name, double latitude, double longitude) {
+        SharedPreferences savedContact = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedContact.edit();
+        editor.putString("locationName", name);
+        editor.putString("locationCoord", "geo:" + String.valueOf(latitude) + "," + String.valueOf(longitude));
+        editor.commit();
+        button_select_navigation.setText(name);
+    }
+
     protected void loadSwitchStatus() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         switch_volume.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false));
@@ -205,6 +228,7 @@ public class GestureActivation extends ActionBarActivity {
             switch_flashlight.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
         }
         button_select_contact.setText(savedSwitchStatus.getString("contactName", getResources().getString(R.string.button_contact_selection)));
+        button_select_navigation.setText(savedSwitchStatus.getString("locationName", getResources().getString(R.string.button_navigation_select)));
     }
 
     public static boolean isCameraAvailable(Context context) {

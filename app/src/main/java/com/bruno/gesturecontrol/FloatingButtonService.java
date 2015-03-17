@@ -53,6 +53,7 @@ public class FloatingButtonService extends Service {
             private float initialTouchX;
             private float initialTouchY;
             boolean isClick = false;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
