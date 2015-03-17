@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -168,7 +171,7 @@ public class GestureFunctions extends IntentService {
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -186,7 +189,7 @@ public class GestureFunctions extends IntentService {
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -200,7 +203,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -214,7 +217,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -229,7 +232,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -245,7 +248,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -255,7 +258,7 @@ public class GestureFunctions extends IntentService {
             System.out.println("twitter");
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -282,7 +285,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
     }
 
@@ -297,7 +300,17 @@ public class GestureFunctions extends IntentService {
             cam.startPreview();
         }
         else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            informGestureDisabled();
         }
+    }
+
+    private void informGestureDisabled() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

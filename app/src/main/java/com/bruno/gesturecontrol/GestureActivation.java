@@ -24,17 +24,17 @@ public class GestureActivation extends ActionBarActivity {
 
     private final int PICK_CONTACT = 15;
 
-    Switch switch_volume;
-    Switch switch_camera;
-    Switch switch_phone;
-    Switch switch_contact;
-    Switch switch_navigation;
-    Switch switch_twitter;
-    Switch switch_mute_notifications;
-    Switch switch_flashlight;
+    static Switch switch_volume;
+    static Switch switch_camera;
+    static Switch switch_phone;
+    static Switch switch_contact;
+    static Switch switch_navigation;
+    static Switch switch_twitter;
+    static Switch switch_mute_notifications;
+    static Switch switch_flashlight;
 
-    Button button_select_contact;
-    Button button_select_navigation;
+    static Button button_select_contact;
+    static Button button_select_navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,12 +144,9 @@ public class GestureActivation extends ActionBarActivity {
 
                             if (cursorPhone.moveToFirst()) {
                                 telephone = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                telephone = "tel:" + telephone;
                             }
                             cursorPhone.close();
-
-                            Log.d("name", name);
-                            Log.d("has phone number", hasPhoneNumber);
-                            Log.d("telephone", telephone);
                             saveContact(name, telephone);
                         }
                         else {
@@ -162,7 +159,7 @@ public class GestureActivation extends ActionBarActivity {
         }
     }
 
-    protected void saveSwitchStatus() {
+    public void saveSwitchStatus() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         SharedPreferences.Editor editor = savedSwitchStatus.edit();
         editor.putBoolean(getResources().getString(R.string.switch_volume), switch_volume.isChecked());
@@ -207,6 +204,7 @@ public class GestureActivation extends ActionBarActivity {
         else {
             switch_flashlight.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false));
         }
+        button_select_contact.setText(savedSwitchStatus.getString("contactName", getResources().getString(R.string.button_contact_selection)));
     }
 
     public static boolean isCameraAvailable(Context context) {
