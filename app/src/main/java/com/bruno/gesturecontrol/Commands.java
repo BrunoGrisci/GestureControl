@@ -74,14 +74,19 @@ public class Commands extends ActionBarActivity {
         button_contact.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //callContact();
-               GestureFunctions.startActionCallContact(getApplicationContext(), "tel:955538002");
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                String tel = savedSwitchStatus.getString("contactNumber", "tel:955538002");
+                GestureFunctions.startActionCallContact(getApplicationContext(), tel);
             }
         });
 
         button_navigation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //goToPlace();
-                GestureFunctions.startActionNavigate(getApplicationContext(), "geo:37.7749,-122.4194");
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                String latitude = savedSwitchStatus.getString("locationLatitude", "64.282062");
+                String longitude = savedSwitchStatus.getString("locationLongitude", "-20.346240");
+                GestureFunctions.startActionNavigate(getApplicationContext(), Double.parseDouble(latitude), Double.parseDouble(longitude));
             }
         });
 
@@ -224,7 +229,7 @@ public class Commands extends ActionBarActivity {
 
     public void goToPlace() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-        String coord = savedSwitchStatus.getString("locationCoord", "geo:37.7749,-122.4194");
+        String coord = savedSwitchStatus.getString("locationCoord", "geo:64.282062,-20.346240");
         Uri gmmIntentUri = Uri.parse(coord);
         Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         intent.setPackage("com.google.android.apps.maps");

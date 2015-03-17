@@ -44,6 +44,7 @@
 
     <string name="name_first_message">Give a name before saving</string>
     <string name="unknown_address">Unknown address</string>
+    <string name="no_navigation">Google Navigation not installed.</string>
     unknown_address
 
 </resources>

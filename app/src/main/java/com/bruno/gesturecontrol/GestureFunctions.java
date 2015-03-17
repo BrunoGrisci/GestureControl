@@ -12,6 +12,10 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Locale;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -92,10 +96,11 @@ public class GestureFunctions extends IntentService {
         context.startService(intent);
     }
 
-    public static void startActionNavigate(Context context, String param1) {
+    public static void startActionNavigate(Context context, double param1, double param2) {
         Intent intent = new Intent(context, GestureFunctions.class);
         intent.setAction(ACTION_NAVIGATE);
         intent.putExtra(EXTRA_PARAM1, param1);
+        intent.putExtra(EXTRA_PARAM2, param2);
         context.startService(intent);
     }
 
@@ -142,8 +147,9 @@ public class GestureFunctions extends IntentService {
                 handleActionCallContact(param1);
             }
             else if (ACTION_NAVIGATE.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                handleActionNavigate(param1);
+                final double param1 = intent.getDoubleExtra(EXTRA_PARAM1, 0.0);
+                final double param2 = intent.getDoubleExtra(EXTRA_PARAM2, 0.0);
+                handleActionNavigate(param1, param2);
             }
             else if (ACTION_POST_TWITTER.equals(action)) {
                 handleActionPostTwitter();
@@ -236,15 +242,27 @@ public class GestureFunctions extends IntentService {
         }
     }
 
-    private void handleActionNavigate(String coord) {
+    private void handleActionNavigate(double latitude, double longitude) {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false)) {
-            Uri gmmIntentUri = Uri.parse(coord);
-            Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            intent.setPackage("com.google.android.apps.maps");
+            String uri = "google.navigation:q=%f, %f";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Locale.US, uri, latitude, longitude)));
+
+            //Uri gmmIntentUri = Uri.parse(coord);
+            //Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            //intent.setPackage("com.google.android.apps.maps");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
+            }
+            else {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_navigation), Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         }
         else {

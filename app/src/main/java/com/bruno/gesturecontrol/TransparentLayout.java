@@ -98,8 +98,9 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
             }
             else if (GESTURE_TRIANGLE.equalsIgnoreCase(result)) {
                 SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-                String coord = savedSwitchStatus.getString("locationCoord", "geo:37.7749,-122.4194");
-                GestureFunctions.startActionNavigate(getApplicationContext(), coord);
+                String latitude = savedSwitchStatus.getString("locationLatitude", "64.282062");
+                String longitude = savedSwitchStatus.getString("locationLongitude", "-20.346240");
+                GestureFunctions.startActionNavigate(getApplicationContext(), Double.parseDouble(latitude), Double.parseDouble(longitude));
                 killActivity();
             }
             else {

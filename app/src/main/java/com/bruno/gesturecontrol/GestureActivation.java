@@ -200,7 +200,8 @@ public class GestureActivation extends ActionBarActivity {
         SharedPreferences savedContact = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         SharedPreferences.Editor editor = savedContact.edit();
         editor.putString("locationName", name);
-        editor.putString("locationCoord", "geo:" + String.valueOf(latitude) + "," + String.valueOf(longitude));
+        editor.putString("locationLatitude", String.valueOf(latitude));
+        editor.putString("locationLongitude", String.valueOf(longitude));
         editor.commit();
         button_select_navigation.setText(name);
     }
