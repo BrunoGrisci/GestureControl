@@ -11,6 +11,7 @@ import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +52,9 @@ public class GestureActivation extends ActionBarActivity {
         button_select_contact = (Button) findViewById(R.id.button_contact_selection);
         button_select_contact.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+                startActivityForResult(intent, PICK_CONTACT);
             }
         });
 
@@ -116,6 +119,49 @@ public class GestureActivation extends ActionBarActivity {
         saveSwitchStatus();
     }
 
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+        switch (reqCode) {
+            case (PICK_CONTACT) :
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor c =  getContentResolver().query(contactData, null, null, null, null);
+                    if (c.moveToFirst()) {
+                        String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        String hasPhoneNumber = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                        String contactID = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                        String telephone = null;
+
+                        if (Integer.parseInt(hasPhoneNumber) > 0) {
+                            Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                    new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
+                                            ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+                                            ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+                                    new String[]{contactID}, null);
+
+                            if (cursorPhone.moveToFirst()) {
+                                telephone = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            }
+                            cursorPhone.close();
+
+                            Log.d("name", name);
+                            Log.d("has phone number", hasPhoneNumber);
+                            Log.d("telephone", telephone);
+                            saveContact(name, telephone);
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), name + " " + getResources().getString(R.string.no_phone), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    c.close();
+                }
+                break;
+        }
+    }
+
     protected void saveSwitchStatus() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         SharedPreferences.Editor editor = savedSwitchStatus.edit();
@@ -128,6 +174,15 @@ public class GestureActivation extends ActionBarActivity {
         editor.putBoolean(getResources().getString(R.string.switch_mute_notifications), switch_mute_notifications.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_flashlight), switch_flashlight.isChecked());
         editor.commit();
+    }
+
+    public void saveContact(String name, String telephone) {
+        SharedPreferences savedContact = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedContact.edit();
+        editor.putString("contactName", name);
+        editor.putString("contactNumber", telephone);
+        editor.commit();
+        button_select_contact.setText(name);
     }
 
     protected void loadSwitchStatus() {

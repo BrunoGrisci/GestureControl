@@ -213,8 +213,10 @@ public class Commands extends ActionBarActivity {
     }
 
     public void callContact() {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        String tel = savedSwitchStatus.getString("contactNumber", "tel:955538002");
         Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:955538002"));
+        intent.setData(Uri.parse(tel));
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.widget.Toast;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -166,6 +167,9 @@ public class GestureFunctions extends IntentService {
             audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -181,6 +185,9 @@ public class GestureFunctions extends IntentService {
             audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void handleActionLaunchCamera() {
@@ -191,6 +198,9 @@ public class GestureFunctions extends IntentService {
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -203,6 +213,9 @@ public class GestureFunctions extends IntentService {
                 startActivity(intent);
             }
         }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void handleActionCallContact(String tel) {
@@ -214,6 +227,9 @@ public class GestureFunctions extends IntentService {
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -228,12 +244,18 @@ public class GestureFunctions extends IntentService {
                 startActivity(intent);
             }
         }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void handleActionPostTwitter() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
             System.out.println("twitter");
+        }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -259,6 +281,9 @@ public class GestureFunctions extends IntentService {
                     break;
             }
         }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void handleActionTurnFlashlight() {
@@ -270,6 +295,9 @@ public class GestureFunctions extends IntentService {
             p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             cam.setParameters(p);
             cam.startPreview();
+        }
+        else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 }

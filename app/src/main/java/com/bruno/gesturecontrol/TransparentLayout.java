@@ -1,5 +1,6 @@
 package com.bruno.gesturecontrol;
 
+import android.content.SharedPreferences;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
@@ -89,7 +90,9 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                 killActivity();
             }
             else if (GESTURE_HEART.equalsIgnoreCase(result)) {
-                GestureFunctions.startActionCallContact(getApplicationContext(), "tel:955538002");
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                String tel = savedSwitchStatus.getString("contactNumber", "tel:955538002");
+                GestureFunctions.startActionCallContact(getApplicationContext(), tel);
                 killActivity();
             }
             else if (GESTURE_TRIANGLE.equalsIgnoreCase(result)) {

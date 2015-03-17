@@ -41,7 +41,7 @@ public class FloatingButtonService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.TOP | Gravity.LEFT;
+        params.gravity = Gravity.TOP | Gravity.RIGHT;
         params.x = 0;
         params.y = 100;
 
