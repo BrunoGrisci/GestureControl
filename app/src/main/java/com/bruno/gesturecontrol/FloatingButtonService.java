@@ -73,6 +73,9 @@ public class FloatingButtonService extends Service {
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
+                        if ((int) (event.getRawX() - initialTouchX) > 30 || (int) (event.getRawY() - initialTouchY) > 30) {
+                            isClick = false;
+                        }
                         params.x = initialX + (int) (event.getRawX() - initialTouchX);
                         params.y = initialY + (int) (event.getRawY() - initialTouchY);
                         windowManager.updateViewLayout(chatHead, params);
