@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class GestureActivation extends ActionBarActivity {
     Button button_select_navigation;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gesture_activation);
 
@@ -75,6 +76,18 @@ public class GestureActivation extends ActionBarActivity {
         switch_twitter = (Switch) findViewById(R.id.switch_twitter);
         switch_mute_notifications = (Switch) findViewById(R.id.switch_mute_notifications);
         switch_flashlight = (Switch) findViewById(R.id.switch_flashlight);
+
+       switch_mute_notifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSwitchStatus();
+            }
+        });
+
+        switch_flashlight.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSwitchStatus();
+            }
+        });
 
         loadSwitchStatus();
 

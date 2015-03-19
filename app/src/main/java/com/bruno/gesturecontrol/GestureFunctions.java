@@ -303,7 +303,7 @@ public class GestureFunctions extends IntentService {
             }
         }
         else {
-            informGestureDisabled();
+            //informGestureDisabled();
         }
     }
 
@@ -318,7 +318,7 @@ public class GestureFunctions extends IntentService {
             cam.startPreview();
         }
         else {
-            informGestureDisabled();
+            //informGestureDisabled();
         }
     }
 

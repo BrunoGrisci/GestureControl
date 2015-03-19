@@ -1,19 +1,24 @@
 package com.bruno.gesturecontrol;
 
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 
 public class MainActivity extends TabActivity {
@@ -21,6 +26,7 @@ public class MainActivity extends TabActivity {
     SensorManager sensorManager;
 
     private final float SHAKE_THRESHOLD = 1.5f;
+    private final int NUMBER_SHAKES_THRESHOLD = 10;
 
     private int accuracyAccelerometer;
 
@@ -33,17 +39,24 @@ public class MainActivity extends TabActivity {
     private float zPreviousAccelerometer;
 
     private boolean firstShake = false;
-    private boolean shakeInitialized = false;
+    private int shakeInitialized = 0;
 
     private final SensorEventListener sensorEventListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent se) {
             updateAccelerometerParameters(se.values[0], se.values[1], se.values[2]);
-            if ((!shakeInitialized) && isAccelerationChanged()) {
-                shakeInitialized = true;
-            } else if ((shakeInitialized) && isAccelerationChanged()) {
-                GestureFunctions.startActionLaunchPhone(getApplicationContext());
-            } else if ((shakeInitialized) && (!isAccelerationChanged())) {
-                shakeInitialized = false;
+            if ((shakeInitialized < NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
+                shakeInitialized = shakeInitialized + 1;
+                System.out.println(shakeInitialized);
+            } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
+                Log.d("shake", "shaked");
+            } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
+                shakeInitialized = 0;
+            }
+            if (se.values[2] <= 0) {
+                muteNotifications(getApplicationContext());
+            }
+            else {
+                unmuteNotifications(getApplicationContext());
             }
         }
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -72,6 +85,44 @@ public class MainActivity extends TabActivity {
         float deltaY = Math.abs(yPreviousAccelerometer - yAccelerometer);
         float deltaZ = Math.abs(zPreviousAccelerometer - zAccelerometer);
         return (deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD);
+    }
+
+    public void muteNotifications(Context context) {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
+            AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+            switch(audioManager.getRingerMode() ){
+                case AudioManager.RINGER_MODE_NORMAL:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    break;
+                case AudioManager.RINGER_MODE_VIBRATE:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    break;
+            }
+        }
+    }
+
+    public void unmuteNotifications(Context context) {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
+            AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+            switch(audioManager.getRingerMode() ){
+                case AudioManager.RINGER_MODE_SILENT:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    break;
+                case AudioManager.RINGER_MODE_VIBRATE:
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    break;
+            }
+        }
     }
 
     @Override
