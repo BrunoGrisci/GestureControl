@@ -2,6 +2,9 @@ package com.bruno.gesturecontrol;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -15,6 +18,62 @@ import android.widget.TabHost;
 
 public class MainActivity extends TabActivity {
 
+    SensorManager sensorManager;
+
+    private final float SHAKE_THRESHOLD = 1.5f;
+
+    private int accuracyAccelerometer;
+
+    private float xAccelerometer;
+    private float yAccelerometer;
+    private float zAccelerometer;
+
+    private float xPreviousAccelerometer;
+    private float yPreviousAccelerometer;
+    private float zPreviousAccelerometer;
+
+    private boolean firstShake = false;
+    private boolean shakeInitialized = false;
+
+    private final SensorEventListener sensorEventListener = new SensorEventListener() {
+        public void onSensorChanged(SensorEvent se) {
+            updateAccelerometerParameters(se.values[0], se.values[1], se.values[2]);
+            if ((!shakeInitialized) && isAccelerationChanged()) {
+                shakeInitialized = true;
+            } else if ((shakeInitialized) && isAccelerationChanged()) {
+                GestureFunctions.startActionLaunchPhone(getApplicationContext());
+            } else if ((shakeInitialized) && (!isAccelerationChanged())) {
+                shakeInitialized = false;
+            }
+        }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            accuracyAccelerometer = accuracy;
+        }
+    };
+
+    private void updateAccelerometerParameters(float xNewAccelerometer, float yNewAccelerometer, float zNewAccelerometer) {
+        if (firstShake) {
+            xPreviousAccelerometer = xNewAccelerometer;
+            yPreviousAccelerometer = yNewAccelerometer;
+            zPreviousAccelerometer = zNewAccelerometer;
+            firstShake = false;
+        } else {
+            xPreviousAccelerometer = xAccelerometer;
+            yPreviousAccelerometer = yAccelerometer;
+            zPreviousAccelerometer = zAccelerometer;
+        }
+        xAccelerometer = xNewAccelerometer;
+        yAccelerometer = yNewAccelerometer;
+        zAccelerometer = zNewAccelerometer;
+    }
+
+    private boolean isAccelerationChanged() {
+        float deltaX = Math.abs(xPreviousAccelerometer - xAccelerometer);
+        float deltaY = Math.abs(yPreviousAccelerometer - yAccelerometer);
+        float deltaZ = Math.abs(zPreviousAccelerometer - zAccelerometer);
+        return (deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +85,13 @@ public class MainActivity extends TabActivity {
         mTabHost.setCurrentTab(0);
 
         startService(new Intent(getApplicationContext(), FloatingButtonService.class));
+
+        sensorManager = (SensorManager) getSystemService(getApplicationContext().SENSOR_SERVICE);
+        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
     }
+
+
 
     @Override
     public void onDestroy() {
