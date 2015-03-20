@@ -29,6 +29,7 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     private final String GESTURE_CIRCULAR_COUNTERCLOCKWISE = "CIRCULAR_COUNTERCLOCKWISE";
     private final String GESTURE_HEART = "HEART";
     private final String GESTURE_TRIANGLE = "TRIANGLE";
+    private final String GESTURE_M = "M";
 
     private final double SCORE_THRESHOLD = 2.0;
 
@@ -101,6 +102,10 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                 String latitude = savedSwitchStatus.getString("locationLatitude", "64.282062");
                 String longitude = savedSwitchStatus.getString("locationLongitude", "-20.346240");
                 GestureFunctions.startActionNavigate(getApplicationContext(), Double.parseDouble(latitude), Double.parseDouble(longitude));
+                killActivity();
+            }
+            else if (GESTURE_M.equalsIgnoreCase(result)) {
+                GestureFunctions.startActionLaunchMessage(getApplicationContext());
                 killActivity();
             }
             else {

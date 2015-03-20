@@ -30,6 +30,7 @@ public class GestureActivation extends ActionBarActivity {
     Switch switch_camera;
     Switch switch_phone;
     Switch switch_contact;
+    Switch switch_message;
     Switch switch_navigation;
     Switch switch_twitter;
     Switch switch_mute_notifications;
@@ -72,6 +73,7 @@ public class GestureActivation extends ActionBarActivity {
         switch_camera = (Switch) findViewById(R.id.switch_camera);
         switch_phone = (Switch) findViewById(R.id.switch_phone);
         switch_contact = (Switch) findViewById(R.id.switch_contact);
+        switch_message = (Switch) findViewById(R.id.switch_message);
         switch_navigation = (Switch) findViewById(R.id.switch_navigation);
         switch_twitter = (Switch) findViewById(R.id.switch_twitter);
         switch_mute_notifications = (Switch) findViewById(R.id.switch_mute_notifications);
@@ -193,6 +195,7 @@ public class GestureActivation extends ActionBarActivity {
         editor.putBoolean(getResources().getString(R.string.switch_camera), switch_camera.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_phone), switch_phone.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_contact), switch_contact.isChecked());
+        editor.putBoolean(getResources().getString(R.string.switch_message), switch_message.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_navigation), switch_navigation.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_twitter), switch_twitter.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_mute_notifications), switch_mute_notifications.isChecked());
@@ -231,6 +234,7 @@ public class GestureActivation extends ActionBarActivity {
         }
         switch_phone.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false));
         switch_contact.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false));
+        switch_message.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false));
         switch_navigation.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false));
         switch_twitter.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false));
         switch_mute_notifications.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));

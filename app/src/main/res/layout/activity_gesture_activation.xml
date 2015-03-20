@@ -67,6 +67,20 @@
                 android:text="Small Text"
                 android:id="@+id/textView9" />
 
+            <Switch
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/switch_message"
+                android:id="@+id/switch_message" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/textView9" />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"

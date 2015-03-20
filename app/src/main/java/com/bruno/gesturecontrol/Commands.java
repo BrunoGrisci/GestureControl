@@ -23,6 +23,7 @@ public class Commands extends ActionBarActivity {
     Button button_camera;
     Button button_phone;
     Button button_contact;
+    Button button_message;
     Button button_navigation;
     Button button_twitter;
     Button button_mute_notifications;
@@ -38,6 +39,7 @@ public class Commands extends ActionBarActivity {
         button_camera = (Button) findViewById(R.id.button_camera);
         button_phone = (Button) findViewById(R.id.button_phone);
         button_contact = (Button) findViewById(R.id.button_contact);
+        button_message = (Button) findViewById(R.id.button_message);
         button_navigation = (Button) findViewById(R.id.button_navigation);
         button_twitter = (Button) findViewById(R.id.button_twitter);
         button_mute_notifications = (Button) findViewById(R.id.button_mute_notifications);
@@ -80,9 +82,14 @@ public class Commands extends ActionBarActivity {
             }
         });
 
+        button_message.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {;
+                GestureFunctions.startActionLaunchMessage(getApplicationContext());
+            }
+        });
+
         button_navigation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //goToPlace();
                 SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
                 String latitude = savedSwitchStatus.getString("locationLatitude", "64.282062");
                 String longitude = savedSwitchStatus.getString("locationLongitude", "-20.346240");
@@ -92,7 +99,6 @@ public class Commands extends ActionBarActivity {
 
         button_twitter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //postTwitter();
                 GestureFunctions.startActionPostTwitter(getApplicationContext());
             }
         });
@@ -119,7 +125,6 @@ public class Commands extends ActionBarActivity {
 
         button_flashlight.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //turnFlashlight();
                 GestureFunctions.startActionTurnFlashlight(getApplicationContext());
             }
         });
@@ -169,6 +174,7 @@ public class Commands extends ActionBarActivity {
         button_camera.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false));
         button_phone.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false));
         button_contact.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false));
+        button_message.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false));
         button_navigation.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false));
         button_twitter.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false));
         button_mute_notifications.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false));
@@ -186,61 +192,6 @@ public class Commands extends ActionBarActivity {
                 button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
                 break;
         }
-    }
-
-    public void increaseVolume (Context context) {
-        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-    }
-
-    public void decreaseVolume (Context context) {
-        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
-    }
-
-    public void launchCamera () {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    public void launchPhone() {
-        Intent intent = new Intent(Intent.ACTION_DIAL, null);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    public void callContact() {
-        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-        String tel = savedSwitchStatus.getString("contactNumber", "tel:955538002");
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse(tel));
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    public void goToPlace() {
-        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-        String coord = savedSwitchStatus.getString("locationCoord", "geo:64.282062,-20.346240");
-        Uri gmmIntentUri = Uri.parse(coord);
-        Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        intent.setPackage("com.google.android.apps.maps");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    public void postTwitter() {
-        System.out.println("twitter");
     }
 
     public void muteNotifications(Context context) {
@@ -261,15 +212,6 @@ public class Commands extends ActionBarActivity {
             audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
             audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
-    }
-
-    public void turnFlashlight() {
-        System.out.println("flashlight");
-        Camera cam = Camera.open();
-        Camera.Parameters p = cam.getParameters();
-        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        cam.setParameters(p);
-        cam.startPreview();
     }
 
 }

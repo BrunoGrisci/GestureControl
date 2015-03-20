@@ -31,6 +31,7 @@ public class GestureFunctions extends IntentService {
     private static final String ACTION_LAUNCH_CAMERA = "com.bruno.gesturecontrol.action.LAUNCH_CAMERA";
     private static final String ACTION_LAUNCH_PHONE = "com.bruno.gesturecontrol.action.LAUNCH_PHONE";
     private static final String ACTION_CALL_CONTACT = "com.bruno.gesturecontrol.action.CALL_CONTACT";
+    private static final String ACTION_LAUNCH_MESSAGE = "com.bruno.gesturecontrol.action.LAUNCH_MESSAGE";
     private static final String ACTION_NAVIGATE = "com.bruno.gesturecontrol.action.NAVIGATE";
     private static final String ACTION_POST_TWITTER = "com.bruno.gesturecontrol.action.POST_TWITTER";
     //private static final String ACTION_MUTE_NOTIFICATIONS = "com.bruno.gesturecontrol.action.MUTE_NOTIFICATIONS";
@@ -96,6 +97,12 @@ public class GestureFunctions extends IntentService {
         context.startService(intent);
     }
 
+    public static void startActionLaunchMessage(Context context) {
+        Intent intent = new Intent(context, GestureFunctions.class);
+        intent.setAction(ACTION_LAUNCH_MESSAGE);
+        context.startService(intent);
+    }
+
     public static void startActionNavigate(Context context, double param1, double param2) {
         Intent intent = new Intent(context, GestureFunctions.class);
         intent.setAction(ACTION_NAVIGATE);
@@ -145,6 +152,9 @@ public class GestureFunctions extends IntentService {
             else if (ACTION_CALL_CONTACT.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
                 handleActionCallContact(param1);
+            }
+            else if (ACTION_LAUNCH_MESSAGE.equals(action)) {
+                handleActionLaunchMessage();
             }
             else if (ACTION_NAVIGATE.equals(action)) {
                 final double param1 = intent.getDoubleExtra(EXTRA_PARAM1, 0.0);
@@ -233,6 +243,21 @@ public class GestureFunctions extends IntentService {
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse(tel));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        }
+        else {
+            informGestureDisabled();
+        }
+    }
+
+    private void handleActionLaunchMessage() {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false)) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse("sms:"));
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             }

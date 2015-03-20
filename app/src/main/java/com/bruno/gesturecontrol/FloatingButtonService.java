@@ -11,22 +11,20 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-/**
- * Created by bruno on 13/03/15.
- */
-
 //Code adapted from http://www.piwai.info/chatheads-basics/
 public class FloatingButtonService extends Service {
 
     private WindowManager windowManager;
     private ImageView chatHead;
 
-    @Override public IBinder onBind(Intent intent) {
+    @Override
+    public IBinder onBind(Intent intent) {
         // Not used
         return null;
     }
 
-    @Override public void onCreate() {
+    @Override
+    public void onCreate() {
         super.onCreate();
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);

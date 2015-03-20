@@ -55,6 +55,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:text="@string/button_message"
+                android:id="@+id/button_message"/>
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:text="@string/button_phone"
                 android:id="@+id/button_phone"/>
 

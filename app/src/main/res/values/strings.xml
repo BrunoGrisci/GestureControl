@@ -10,6 +10,7 @@
     <string name="switch_camera">Launch camera</string>
     <string name="switch_phone">Launch phone</string>
     <string name="switch_contact">Call contact</string>
+    <string name="switch_message">Send message</string>
     <string name="switch_navigation">Go to place</string>
     <string name="switch_twitter">Post localization on Twitter</string>
     <string name="switch_mute_notifications">Mute notifications</string>
@@ -21,6 +22,7 @@
     <string name="button_camera">Launch camera</string>
     <string name="button_phone">Launch phone</string>
     <string name="button_contact">Call contact</string>
+    <string name="button_message">Send message</string>
     <string name="button_navigation">Go to place</string>
     <string name="button_twitter">Post localization on Twitter</string>
     <string name="button_mute_notifications">Mute notifications</string>
@@ -45,6 +47,6 @@
     <string name="name_first_message">Give a name before saving</string>
     <string name="unknown_address">Unknown address</string>
     <string name="no_navigation">Google Navigation not installed.</string>
-    unknown_address
+
 
 </resources>
