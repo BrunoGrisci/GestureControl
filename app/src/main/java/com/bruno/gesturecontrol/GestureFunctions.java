@@ -33,7 +33,7 @@ public class GestureFunctions extends IntentService {
     private static final String ACTION_CALL_CONTACT = "com.bruno.gesturecontrol.action.CALL_CONTACT";
     private static final String ACTION_NAVIGATE = "com.bruno.gesturecontrol.action.NAVIGATE";
     private static final String ACTION_POST_TWITTER = "com.bruno.gesturecontrol.action.POST_TWITTER";
-    private static final String ACTION_MUTE_NOTIFICATIONS = "com.bruno.gesturecontrol.action.MUTE_NOTIFICATIONS";
+    //private static final String ACTION_MUTE_NOTIFICATIONS = "com.bruno.gesturecontrol.action.MUTE_NOTIFICATIONS";
     private static final String ACTION_TURN_FLASHLIGHT = "com.bruno.gesturecontrol.action.TURN_FLASHLIGHT";
 
     // TODO: Rename parameters
@@ -110,11 +110,11 @@ public class GestureFunctions extends IntentService {
         context.startService(intent);
     }
 
-    public static void startActionMuteNotifications(Context context) {
+    /*public static void startActionMuteNotifications(Context context) {
         Intent intent = new Intent(context, GestureFunctions.class);
         intent.setAction(ACTION_MUTE_NOTIFICATIONS);
         context.startService(intent);
-    }
+    }*/
 
     public static void startActionTurnFlashlight(Context context) {
         Intent intent = new Intent(context, GestureFunctions.class);
@@ -154,9 +154,9 @@ public class GestureFunctions extends IntentService {
             else if (ACTION_POST_TWITTER.equals(action)) {
                 handleActionPostTwitter();
             }
-            else if (ACTION_MUTE_NOTIFICATIONS.equals(action)) {
+            /*else if (ACTION_MUTE_NOTIFICATIONS.equals(action)) {
                 handleActionMuteNotifications();
-            }
+            }*/
             else if (ACTION_TURN_FLASHLIGHT.equals(action)) {
                 handleActionTurnFlashlight();
             }
@@ -280,7 +280,7 @@ public class GestureFunctions extends IntentService {
         }
     }
 
-    private void handleActionMuteNotifications() {
+    /*private void handleActionMuteNotifications() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
             AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
@@ -305,7 +305,7 @@ public class GestureFunctions extends IntentService {
         else {
             //informGestureDisabled();
         }
-    }
+    }*/
 
     private void handleActionTurnFlashlight() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);

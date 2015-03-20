@@ -99,18 +99,19 @@ public class Commands extends ActionBarActivity {
 
         button_mute_notifications.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                muteNotifications(getApplicationContext());
-                //GestureFunctions.startActionMuteNotifications(getApplicationContext());
                 AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
                 switch(audioManager.getRingerMode()){
                     case AudioManager.RINGER_MODE_NORMAL:
-                        button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                        button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                        muteNotifications(getApplicationContext());
                         break;
                     case AudioManager.RINGER_MODE_SILENT:
-                        button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                        button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                        unmuteNotifications(getApplicationContext());
                         break;
                     case AudioManager.RINGER_MODE_VIBRATE:
-                        button_mute_notifications.setText(getResources().getString(R.string.button_unmute_notifications));
+                        button_mute_notifications.setText(getResources().getString(R.string.button_mute_notifications));
+                        unmuteNotifications(getApplicationContext());
                         break;
                 }
             }
@@ -243,23 +244,22 @@ public class Commands extends ActionBarActivity {
     }
 
     public void muteNotifications(Context context) {
-        AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-        switch(audioManager.getRingerMode() ){
-            case AudioManager.RINGER_MODE_NORMAL:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                break;
-            case AudioManager.RINGER_MODE_SILENT:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
-            case AudioManager.RINGER_MODE_VIBRATE:
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                break;
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
+            AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+        }
+    }
+
+    public void unmuteNotifications(Context context) {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
+            AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
     }
 

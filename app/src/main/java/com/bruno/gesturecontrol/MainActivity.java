@@ -41,22 +41,26 @@ public class MainActivity extends TabActivity {
     private boolean firstShake = false;
     private int shakeInitialized = 0;
 
+    private boolean muteChange = true;
+
     private final SensorEventListener sensorEventListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent se) {
             updateAccelerometerParameters(se.values[0], se.values[1], se.values[2]);
             if ((shakeInitialized < NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
                 shakeInitialized = shakeInitialized + 1;
-                System.out.println(shakeInitialized);
             } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
                 Log.d("shake", "shaked");
             } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
                 shakeInitialized = 0;
             }
-            if (se.values[2] <= 0) {
+
+            if (se.values[2] <= -5 && muteChange) {
                 muteNotifications(getApplicationContext());
+                muteChange = !muteChange;
             }
-            else {
+            if (se.values[2] > -5 && !muteChange) {
                 unmuteNotifications(getApplicationContext());
+                muteChange = !muteChange;
             }
         }
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -91,18 +95,9 @@ public class MainActivity extends TabActivity {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
             AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-            switch(audioManager.getRingerMode() ){
-                case AudioManager.RINGER_MODE_NORMAL:
-                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                    break;
-                case AudioManager.RINGER_MODE_VIBRATE:
-                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    break;
-            }
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
         }
     }
 
@@ -110,18 +105,9 @@ public class MainActivity extends TabActivity {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_mute_notifications), false)) {
             AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
-            switch(audioManager.getRingerMode() ){
-                case AudioManager.RINGER_MODE_SILENT:
-                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    break;
-                case AudioManager.RINGER_MODE_VIBRATE:
-                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    break;
-            }
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
     }
 
