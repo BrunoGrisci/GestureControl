@@ -10,7 +10,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -50,6 +52,7 @@ public class MainActivity extends TabActivity {
                 shakeInitialized = shakeInitialized + 1;
             } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
                 Log.d("shake", "shaked");
+                playConfirmationSound();
             } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
                 shakeInitialized = 0;
             }
@@ -107,7 +110,7 @@ public class MainActivity extends TabActivity {
             AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
         }
     }
 
@@ -128,7 +131,21 @@ public class MainActivity extends TabActivity {
 
     }
 
-
+    private void playConfirmationSound() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
+                break;
+        }
+    }
 
     @Override
     public void onDestroy() {

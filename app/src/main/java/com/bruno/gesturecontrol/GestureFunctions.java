@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -212,6 +215,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionLaunchCamera() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false)) {
+            playConfirmationSound();
             Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (intent.resolveActivity(getPackageManager()) != null) {
@@ -226,6 +230,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionLaunchPhone() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false)) {
+            playConfirmationSound();
             Intent intent = new Intent(Intent.ACTION_DIAL, null);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (intent.resolveActivity(getPackageManager()) != null) {
@@ -240,6 +245,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionCallContact(String tel) {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false)) {
+            playConfirmationSound();
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse(tel));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -255,6 +261,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionLaunchMessage() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false)) {
+            playConfirmationSound();
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setData(Uri.parse("sms:"));
@@ -270,6 +277,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionNavigate(double latitude, double longitude) {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_navigation), false)) {
+            playConfirmationSound();
             String uri = "google.navigation:q=%f, %f";
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Locale.US, uri, latitude, longitude)));
 
@@ -298,6 +306,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionPostTwitter() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
+            playConfirmationSound();
             System.out.println("twitter");
         }
         else {
@@ -335,6 +344,7 @@ public class GestureFunctions extends IntentService {
     private void handleActionTurnFlashlight() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
+            playConfirmationSound();
             System.out.println("flashlight");
             Camera cam = Camera.open();
             Camera.Parameters p = cam.getParameters();
@@ -348,6 +358,21 @@ public class GestureFunctions extends IntentService {
     }
 
     private void informGestureDisabled() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(300);
+                v.vibrate(200);
+                break;
+        }
+
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
@@ -355,5 +380,21 @@ public class GestureFunctions extends IntentService {
                 Toast.makeText(getApplicationContext(), getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void playConfirmationSound() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
+                break;
+        }
     }
 }
