@@ -28,6 +28,8 @@ public class GestureActivation extends ActionBarActivity {
 
     Switch switch_volume;
     Switch switch_camera;
+    Switch switch_voice;
+    Switch switch_music;
     Switch switch_phone;
     Switch switch_contact;
     Switch switch_message;
@@ -71,6 +73,8 @@ public class GestureActivation extends ActionBarActivity {
 
         switch_volume = (Switch) findViewById(R.id.switch_volume);
         switch_camera = (Switch) findViewById(R.id.switch_camera);
+        switch_voice = (Switch) findViewById(R.id.switch_voice);
+        switch_music = (Switch) findViewById(R.id.switch_music);
         switch_phone = (Switch) findViewById(R.id.switch_phone);
         switch_contact = (Switch) findViewById(R.id.switch_contact);
         switch_message = (Switch) findViewById(R.id.switch_message);
@@ -193,6 +197,8 @@ public class GestureActivation extends ActionBarActivity {
         SharedPreferences.Editor editor = savedSwitchStatus.edit();
         editor.putBoolean(getResources().getString(R.string.switch_volume), switch_volume.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_camera), switch_camera.isChecked());
+        editor.putBoolean(getResources().getString(R.string.switch_voice), switch_voice.isChecked());
+        editor.putBoolean(getResources().getString(R.string.switch_music), switch_music.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_phone), switch_phone.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_contact), switch_contact.isChecked());
         editor.putBoolean(getResources().getString(R.string.switch_message), switch_message.isChecked());
@@ -232,6 +238,8 @@ public class GestureActivation extends ActionBarActivity {
         else {
             switch_camera.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false));
         }
+        switch_voice.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_voice), false));
+        switch_music.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_music), false));
         switch_phone.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false));
         switch_contact.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false));
         switch_message.setChecked(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false));

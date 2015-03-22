@@ -8,6 +8,8 @@
 
     <string name="switch_volume">Increase/Decrease volume</string>
     <string name="switch_camera">Launch camera</string>
+    <string name="switch_voice">Voice recognition</string>
+    <string name="switch_music">Launch music</string>
     <string name="switch_phone">Launch phone</string>
     <string name="switch_contact">Call contact</string>
     <string name="switch_message">Send message</string>
@@ -20,6 +22,8 @@
     <string name="button_volume_decrese">-</string>
     <string name="button_volume">Volume</string>
     <string name="button_camera">Launch camera</string>
+    <string name="button_voice">Voice recognition</string>
+    <string name="button_music">Listen to music</string>
     <string name="button_phone">Launch phone</string>
     <string name="button_contact">Call contact</string>
     <string name="button_message">Send message</string>
@@ -47,5 +51,9 @@
     <string name="name_first_message">Give a name before saving</string>
     <string name="unknown_address">Unknown address</string>
     <string name="no_navigation">Google Navigation not installed.</string>
+    <string name="my_location_is">I am at</string>
+
+    <string name="twitter_consumer_key">1JFx6ffVFD8GlnEeLUOwo21PG</string>
+    <string name="twitter_secret_key">I3Sc6JnOB7cNHVZBRi1fJtb4AOMtUESGYIjY1Z7cHf7dxRnY3W</string>
 
 </resources>

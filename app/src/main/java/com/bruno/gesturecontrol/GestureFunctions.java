@@ -1,5 +1,6 @@
 package com.bruno.gesturecontrol;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
@@ -16,14 +17,23 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.User;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
+
+import static android.content.Intent.getIntent;
+import static android.content.Intent.getIntentOld;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -38,6 +48,8 @@ public class GestureFunctions extends IntentService {
     private static final String ACTION_INCREASE_VOLUME = "com.bruno.gesturecontrol.action.INCREASE_VOLUME";
     private static final String ACTION_DECREASE_VOLUME = "com.bruno.gesturecontrol.action.DECREASE_VOLUME";
     private static final String ACTION_LAUNCH_CAMERA = "com.bruno.gesturecontrol.action.LAUNCH_CAMERA";
+    private static final String ACTION_LAUNCH_VOICE = "com.bruno.gesturecontrol.action.LAUNCH_VOICE";
+    private static final String ACTION_LAUNCH_MUSIC = "com.bruno.gesturecontrol.action.LAUNCH_MUSIC";
     private static final String ACTION_LAUNCH_PHONE = "com.bruno.gesturecontrol.action.LAUNCH_PHONE";
     private static final String ACTION_CALL_CONTACT = "com.bruno.gesturecontrol.action.CALL_CONTACT";
     private static final String ACTION_LAUNCH_MESSAGE = "com.bruno.gesturecontrol.action.LAUNCH_MESSAGE";
@@ -50,33 +62,14 @@ public class GestureFunctions extends IntentService {
     private static final String EXTRA_PARAM1 = "com.bruno.gesturecontrol.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.bruno.gesturecontrol.extra.PARAM2";
 
-    Camera cam = Camera.open();
-    Camera.Parameters p = cam.getParameters();
+
     private boolean isCameraOn = false;
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
+    /*@Override
+    public void onCreate() {
+        super.onCreate();
 
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-    Intent intent = new Intent(context, GestureFunctions.class);
-    intent.setAction(ACTION_BAZ);
-    intent.putExtra(EXTRA_PARAM1, param1);
-    intent.putExtra(EXTRA_PARAM2, param2);
-    context.startService(intent);
     }*/
-
 
     public static void startActionIncreaseVolume(Context context) {
         Intent intent = new Intent(context, GestureFunctions.class);
@@ -93,6 +86,18 @@ public class GestureFunctions extends IntentService {
     public static void startActionLaunchCamera(Context context) {
         Intent intent = new Intent(context, GestureFunctions.class);
         intent.setAction(ACTION_LAUNCH_CAMERA);
+        context.startService(intent);
+    }
+
+    public static void startActionLaunchVoice(Context context) {
+        Intent intent = new Intent(context, GestureFunctions.class);
+        intent.setAction(ACTION_LAUNCH_VOICE);
+        context.startService(intent);
+    }
+
+    public static void startActionLaunchMusic(Context context) {
+        Intent intent = new Intent(context, GestureFunctions.class);
+        intent.setAction(ACTION_LAUNCH_MUSIC);
         context.startService(intent);
     }
 
@@ -158,6 +163,12 @@ public class GestureFunctions extends IntentService {
             }
             else if (ACTION_LAUNCH_CAMERA.equals(action)) {
                 handleActionLaunchCamera();
+            }
+            else if (ACTION_LAUNCH_VOICE.equals(action)) {
+                handleActionLaunchVoice();
+            }
+            else if (ACTION_LAUNCH_MUSIC.equals(action)) {
+                handleActionLaunchMusic();
             }
             else if (ACTION_LAUNCH_PHONE.equals(action)) {
                 handleActionLaunchPhone();
@@ -230,6 +241,32 @@ public class GestureFunctions extends IntentService {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
+            }
+        }
+        else {
+            informGestureDisabled();
+        }
+    }
+
+    private void handleActionLaunchVoice() {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_voice), false)) {
+            playConfirmationSound();
+            startActivity(new Intent(Intent.ACTION_VOICE_COMMAND).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
+        else {
+            informGestureDisabled();
+        }
+    }
+
+    private void handleActionLaunchMusic() {
+        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_music), false)) {
+            playConfirmationSound();
+            Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+               startActivity(intent);
             }
         }
         else {
@@ -310,42 +347,7 @@ public class GestureFunctions extends IntentService {
     }
 
     private void handleActionPostTwitter() {
-        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
-        if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
-            playConfirmationSound();
-            Location userLocation;
-            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);;
-            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            Geocoder geocoder = new Geocoder(GestureFunctions.this, Locale.getDefault());
-            String address = "";
-            try {
-                List<Address> addLines;
-                addLines = geocoder.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
-                if (addLines.isEmpty()) {
-                    address = getResources().getString(R.string.unknown_address);
-                }
-                else {
-                    for (int i = 0; i < addLines.get(0).getMaxAddressLineIndex(); i++) {
-                        address = address + addLines.get(0).getAddressLine(i) + ", ";
-                    }
-                    address = address + addLines.get(0).getCountryCode();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            final String address_final = "I am at " + address;
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), address_final, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-        else {
-            informGestureDisabled();
-        }
     }
 
     /*private void handleActionMuteNotifications() {
@@ -378,10 +380,11 @@ public class GestureFunctions extends IntentService {
     private void handleActionTurnFlashlight() {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
+            Camera cam = Camera.open();
+            Camera.Parameters p = cam.getParameters();
             playConfirmationSound();
             if (!isCameraOn) {
                 Log.d("flashlight", "ON");
-                Camera.Parameters p = cam.getParameters();
                 p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                 cam.setParameters(p);
                 cam.startPreview();
@@ -389,7 +392,6 @@ public class GestureFunctions extends IntentService {
             }
             else {
                 Log.d("flashlight", "OFF");
-                Camera.Parameters p = cam.getParameters();
                 p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                 cam.stopPreview();
                 cam.release();
@@ -444,4 +446,5 @@ public class GestureFunctions extends IntentService {
                 break;
         }
     }
+
 }

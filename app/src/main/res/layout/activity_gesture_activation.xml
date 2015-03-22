@@ -57,6 +57,34 @@
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:text="@string/switch_voice"
+                android:id="@+id/switch_voice" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/textView26" />
+
+            <Switch
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/switch_music"
+                android:id="@+id/switch_music" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/textView29" />
+
+            <Switch
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:text="@string/switch_phone"
                 android:id="@+id/switch_phone" />
 

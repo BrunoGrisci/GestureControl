@@ -21,6 +21,8 @@ public class Commands extends ActionBarActivity {
     Button button_volume_increase;
     Button button_volume_decrease;
     Button button_camera;
+    Button button_voice;
+    Button button_music;
     Button button_phone;
     Button button_contact;
     Button button_message;
@@ -37,6 +39,8 @@ public class Commands extends ActionBarActivity {
         button_volume_increase = (Button) findViewById(R.id.button_volume_increase);
         button_volume_decrease = (Button) findViewById(R.id.button_volume_decrease);
         button_camera = (Button) findViewById(R.id.button_camera);
+        button_voice = (Button) findViewById(R.id.button_voice);
+        button_music = (Button) findViewById(R.id.button_music);
         button_phone = (Button) findViewById(R.id.button_phone);
         button_contact = (Button) findViewById(R.id.button_contact);
         button_message = (Button) findViewById(R.id.button_message);
@@ -63,6 +67,18 @@ public class Commands extends ActionBarActivity {
             public void onClick(View v) {
                 //launchCamera();
                 GestureFunctions.startActionLaunchCamera(getApplicationContext());
+            }
+        });
+
+        button_voice.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                GestureFunctions.startActionLaunchVoice(getApplicationContext());
+            }
+        });
+
+        button_music.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                GestureFunctions.startActionLaunchMusic(getApplicationContext());
             }
         });
 
@@ -172,6 +188,8 @@ public class Commands extends ActionBarActivity {
         button_volume_increase.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false));
         button_volume_decrease.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_volume), false));
         button_camera.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_camera), false));
+        button_voice.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_voice), false));
+        button_music.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_music), false));
         button_phone.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_phone), false));
         button_contact.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_contact), false));
         button_message.setEnabled(savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_message), false));
