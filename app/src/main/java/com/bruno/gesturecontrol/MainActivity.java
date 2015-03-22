@@ -124,7 +124,9 @@ public class MainActivity extends TabActivity {
         mTabHost.addTab(mTabHost.newTabSpec("second").setIndicator("Commands").setContent(new Intent(this, Commands.class )));
         mTabHost.setCurrentTab(0);
 
-        startService(new Intent(getApplicationContext(), FloatingButtonService.class));
+        Intent i= new Intent(getApplicationContext(), FloatingButtonService.class);
+        getApplicationContext().startService(i);
+        //startService(new Intent(getApplicationContext(), FloatingButtonService.class));
 
         sensorManager = (SensorManager) getSystemService(getApplicationContext().SENSOR_SERVICE);
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);

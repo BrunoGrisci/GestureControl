@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
+import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,11 +18,17 @@ public class FloatingButtonService extends Service {
 
     private WindowManager windowManager;
     private ImageView chatHead;
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        FloatingButtonService getService() {
+            return FloatingButtonService.this;
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // Not used
-        return null;
+        return mBinder;
     }
 
     @Override
@@ -87,9 +95,9 @@ public class FloatingButtonService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return Service.START_STICKY;
+        Log.i("Service", "onStartCommand");
+        return android.app.Service.START_STICKY;
     }
-
 
     @Override
     public void onDestroy() {

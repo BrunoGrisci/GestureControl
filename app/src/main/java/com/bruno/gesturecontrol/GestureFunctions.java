@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -17,6 +21,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -307,7 +313,35 @@ public class GestureFunctions extends IntentService {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
             playConfirmationSound();
-            System.out.println("twitter");
+            Location userLocation;
+            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);;
+            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            Geocoder geocoder = new Geocoder(GestureFunctions.this, Locale.getDefault());
+            String address = "";
+            try {
+                List<Address> addLines;
+                addLines = geocoder.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
+                if (addLines.isEmpty()) {
+                    address = getResources().getString(R.string.unknown_address);
+                }
+                else {
+                    for (int i = 0; i < addLines.get(0).getMaxAddressLineIndex(); i++) {
+                        address = address + addLines.get(0).getAddressLine(i) + ", ";
+                    }
+                    address = address + addLines.get(0).getCountryCode();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            final String address_final = "I am at " + address;
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), address_final, Toast.LENGTH_LONG).show();
+                }
+            });
         }
         else {
             informGestureDisabled();
