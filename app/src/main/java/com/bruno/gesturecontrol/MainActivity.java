@@ -4,6 +4,7 @@ import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,6 +13,9 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
@@ -32,7 +36,7 @@ public class MainActivity extends TabActivity {
     SensorManager sensorManager;
 
     private final float SHAKE_THRESHOLD = 1.5f;
-    private final long TIME_SHAKES_THRESHOLD = 1000;
+    private final long TIME_SHAKES_THRESHOLD = 2000;
 
     private int accuracyAccelerometer;
 
@@ -49,9 +53,14 @@ public class MainActivity extends TabActivity {
 
     private boolean muteChange = true;
 
+    public static boolean isCameraOn = false;
+    static Camera cam = Camera.open();
+
+
     private final SensorEventListener sensorEventListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent se) {
             updateAccelerometerParameters(se.values[0], se.values[1], se.values[2]);
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
             if (se.values[2] <= -5 && muteChange) {
                 muteNotifications(getApplicationContext());
@@ -62,9 +71,16 @@ public class MainActivity extends TabActivity {
                 muteChange = !muteChange;
             }
 
-            else if ((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && isAccelerationChanged()) {
+            else if (((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && isAccelerationChanged()) && pm.isScreenOn()) {
                 Log.d("shake", "shaked");
-                GestureFunctions.startActionTurnFlashlight(getApplicationContext());
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
+                    playConfirmationSound();
+                    turnCamera();
+                }
+                else {
+                    informGestureDisabled();
+                }
                 shakeInitialized = Calendar.getInstance();
             } else if ((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
                 shakeInitialized = Calendar.getInstance();
@@ -137,9 +153,19 @@ public class MainActivity extends TabActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shakeInitialized = Calendar.getInstance();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        //stopService(new Intent(getApplicationContext(), FloatingButtonService.class));
     }
 
     @Override
@@ -162,6 +188,72 @@ public class MainActivity extends TabActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void informGestureDisabled() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(300);
+                v.vibrate(200);
+                break;
+        }
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void playConfirmationSound() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
+                break;
+        }
+    }
+
+    public static void turnCamera() {
+        if (!isCameraOn) {
+            Log.d("flashlight", "ON");
+            if (cam == null) {
+                cam = Camera.open();
+            }
+            Camera.Parameters p = cam.getParameters();
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            cam.setParameters(p);
+            cam.startPreview();
+            isCameraOn = true;
+        }
+        else {
+            Log.d("flashlight", "OFF");
+            Camera.Parameters p = cam.getParameters();
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            cam.stopPreview();
+            cam.release();
+            cam = null;
+            isCameraOn = false;
+        }
     }
 
 }

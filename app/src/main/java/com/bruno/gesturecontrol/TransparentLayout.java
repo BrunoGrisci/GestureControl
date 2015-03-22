@@ -333,6 +333,9 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     @Override
     public boolean onDoubleTapEvent(MotionEvent event) {
         System.out.println("onDoubleTapEvent: " + event.toString());
+        if (MainActivity.isCameraOn) {
+            MainActivity.turnCamera();
+        }
         GestureFunctions.startActionLaunchCamera(getApplicationContext());
         killActivity();
         return true;

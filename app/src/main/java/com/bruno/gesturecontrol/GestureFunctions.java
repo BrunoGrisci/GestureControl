@@ -378,7 +378,7 @@ public class GestureFunctions extends IntentService {
     }*/
 
     private void handleActionTurnFlashlight() {
-        SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+    /*    SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
             Camera cam = Camera.open();
             Camera.Parameters p = cam.getParameters();
@@ -401,7 +401,7 @@ public class GestureFunctions extends IntentService {
         }
         else {
             informGestureDisabled();
-        }
+        }*/
     }
 
     private void informGestureDisabled() {

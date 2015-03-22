@@ -8,13 +8,18 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class Commands extends ActionBarActivity {
 
@@ -66,6 +71,9 @@ public class Commands extends ActionBarActivity {
         button_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //launchCamera();
+                if (MainActivity.isCameraOn) {
+                    MainActivity.turnCamera();
+                }
                 GestureFunctions.startActionLaunchCamera(getApplicationContext());
             }
         });
@@ -141,7 +149,15 @@ public class Commands extends ActionBarActivity {
 
         button_flashlight.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                GestureFunctions.startActionTurnFlashlight(getApplicationContext());
+                //GestureFunctions.startActionTurnFlashlight(getApplicationContext());
+                SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
+                if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
+                    playConfirmationSound();
+                    MainActivity.turnCamera();
+                }
+                else {
+                    informGestureDisabled();
+                }
             }
         });
 
@@ -229,6 +245,49 @@ public class Commands extends ActionBarActivity {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
             audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+        }
+    }
+
+    private void informGestureDisabled() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(300);
+                v.vibrate(200);
+                break;
+        }
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.gesture_disabled), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void playConfirmationSound() {
+        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
+        switch(audioManager.getRingerMode()){
+            case AudioManager.RINGER_MODE_NORMAL:
+                final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mp.start();
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
+                break;
         }
     }
 
