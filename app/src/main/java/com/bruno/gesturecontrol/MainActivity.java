@@ -22,13 +22,17 @@ import android.view.MotionEvent;
 import android.widget.TabHost;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
+import static java.lang.Math.abs;
+
 
 public class MainActivity extends TabActivity {
 
     SensorManager sensorManager;
 
     private final float SHAKE_THRESHOLD = 1.5f;
-    private final int NUMBER_SHAKES_THRESHOLD = 10;
+    private final long TIME_SHAKES_THRESHOLD = 1000;
 
     private int accuracyAccelerometer;
 
@@ -41,29 +45,29 @@ public class MainActivity extends TabActivity {
     private float zPreviousAccelerometer;
 
     private boolean firstShake = false;
-    private int shakeInitialized = 0;
+    private Calendar shakeInitialized = Calendar.getInstance();
 
     private boolean muteChange = true;
 
     private final SensorEventListener sensorEventListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent se) {
             updateAccelerometerParameters(se.values[0], se.values[1], se.values[2]);
-            if ((shakeInitialized < NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
-                shakeInitialized = shakeInitialized + 1;
-            } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && isAccelerationChanged()) {
-                Log.d("shake", "shaked");
-                playConfirmationSound();
-            } else if ((shakeInitialized >= NUMBER_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
-                shakeInitialized = 0;
-            }
 
             if (se.values[2] <= -5 && muteChange) {
                 muteNotifications(getApplicationContext());
                 muteChange = !muteChange;
             }
-            if (se.values[2] > -5 && !muteChange) {
+            else if (se.values[2] > -5 && !muteChange) {
                 unmuteNotifications(getApplicationContext());
                 muteChange = !muteChange;
+            }
+
+            else if ((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && isAccelerationChanged()) {
+                Log.d("shake", "shaked");
+                GestureFunctions.startActionTurnFlashlight(getApplicationContext());
+                shakeInitialized = Calendar.getInstance();
+            } else if ((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
+                shakeInitialized = Calendar.getInstance();
             }
         }
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -88,9 +92,9 @@ public class MainActivity extends TabActivity {
     }
 
     private boolean isAccelerationChanged() {
-        float deltaX = Math.abs(xPreviousAccelerometer - xAccelerometer);
-        float deltaY = Math.abs(yPreviousAccelerometer - yAccelerometer);
-        float deltaZ = Math.abs(zPreviousAccelerometer - zAccelerometer);
+        float deltaX = abs(xPreviousAccelerometer - xAccelerometer);
+        float deltaY = abs(yPreviousAccelerometer - yAccelerometer);
+        float deltaZ = abs(zPreviousAccelerometer - zAccelerometer);
         return (deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD);
     }
 
@@ -126,33 +130,16 @@ public class MainActivity extends TabActivity {
 
         Intent i= new Intent(getApplicationContext(), FloatingButtonService.class);
         getApplicationContext().startService(i);
-        //startService(new Intent(getApplicationContext(), FloatingButtonService.class));
 
         sensorManager = (SensorManager) getSystemService(getApplicationContext().SENSOR_SERVICE);
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
     }
 
-    private void playConfirmationSound() {
-        AudioManager audioManager = (AudioManager)getSystemService(getApplicationContext().AUDIO_SERVICE);
-        switch(audioManager.getRingerMode()){
-            case AudioManager.RINGER_MODE_NORMAL:
-                final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
-                mp.start();
-                break;
-            case AudioManager.RINGER_MODE_SILENT:
-                break;
-            case AudioManager.RINGER_MODE_VIBRATE:
-                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(500);
-                break;
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(getApplicationContext(), FloatingButtonService.class));
+        //stopService(new Intent(getApplicationContext(), FloatingButtonService.class));
     }
 
     @Override

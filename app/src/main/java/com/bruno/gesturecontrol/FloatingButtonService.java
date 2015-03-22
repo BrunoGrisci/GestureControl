@@ -79,7 +79,7 @@ public class FloatingButtonService extends Service {
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
-                        if ((int) (event.getRawX() - initialTouchX) > 30 || (int) (event.getRawY() - initialTouchY) > 30) {
+                        if ((int) (event.getRawX() - initialTouchX) > 50 || (int) (event.getRawY() - initialTouchY) > 50) {
                             isClick = false;
                         }
                         params.x = initialX + (int) (event.getRawX() - initialTouchX);

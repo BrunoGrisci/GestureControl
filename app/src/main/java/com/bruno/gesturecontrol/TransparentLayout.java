@@ -118,6 +118,7 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                 switch(audioManager.getRingerMode()){
                     case AudioManager.RINGER_MODE_NORMAL:
                         final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                         mp.start();
                         break;
                     case AudioManager.RINGER_MODE_SILENT:
@@ -204,6 +205,7 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
         switch(audioManager.getRingerMode()){
             case AudioManager.RINGER_MODE_NORMAL:
                 final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mp.start();
                 break;
             case AudioManager.RINGER_MODE_SILENT:

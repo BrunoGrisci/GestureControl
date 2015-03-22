@@ -50,6 +50,10 @@ public class GestureFunctions extends IntentService {
     private static final String EXTRA_PARAM1 = "com.bruno.gesturecontrol.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.bruno.gesturecontrol.extra.PARAM2";
 
+    Camera cam = Camera.open();
+    Camera.Parameters p = cam.getParameters();
+    private boolean isCameraOn = false;
+
     /**
      * Starts this service to perform action Foo with the given parameters. If
      * the service is already performing a task this action will be queued.
@@ -286,10 +290,6 @@ public class GestureFunctions extends IntentService {
             playConfirmationSound();
             String uri = "google.navigation:q=%f, %f";
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Locale.US, uri, latitude, longitude)));
-
-            //Uri gmmIntentUri = Uri.parse(coord);
-            //Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            //intent.setPackage("com.google.android.apps.maps");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
@@ -379,15 +379,26 @@ public class GestureFunctions extends IntentService {
         SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
         if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_flashlight), false)) {
             playConfirmationSound();
-            System.out.println("flashlight");
-            Camera cam = Camera.open();
-            Camera.Parameters p = cam.getParameters();
-            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            cam.setParameters(p);
-            cam.startPreview();
+            if (!isCameraOn) {
+                Log.d("flashlight", "ON");
+                Camera.Parameters p = cam.getParameters();
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                cam.setParameters(p);
+                cam.startPreview();
+                isCameraOn = true;
+            }
+            else {
+                Log.d("flashlight", "OFF");
+                Camera.Parameters p = cam.getParameters();
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                cam.stopPreview();
+                cam.release();
+                cam = null;
+                isCameraOn = false;
+            }
         }
         else {
-            //informGestureDisabled();
+            informGestureDisabled();
         }
     }
 
@@ -396,6 +407,7 @@ public class GestureFunctions extends IntentService {
         switch(audioManager.getRingerMode()){
             case AudioManager.RINGER_MODE_NORMAL:
                 final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.noconfirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mp.start();
                 break;
             case AudioManager.RINGER_MODE_SILENT:
@@ -421,6 +433,7 @@ public class GestureFunctions extends IntentService {
         switch(audioManager.getRingerMode()){
             case AudioManager.RINGER_MODE_NORMAL:
                 final MediaPlayer mp = MediaPlayer.create(this, R.raw.confirmation);
+                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mp.start();
                 break;
             case AudioManager.RINGER_MODE_SILENT:
