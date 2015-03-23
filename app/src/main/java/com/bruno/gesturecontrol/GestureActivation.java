@@ -83,7 +83,13 @@ public class GestureActivation extends ActionBarActivity {
         switch_mute_notifications = (Switch) findViewById(R.id.switch_mute_notifications);
         switch_flashlight = (Switch) findViewById(R.id.switch_flashlight);
 
-       switch_mute_notifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switch_volume.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveSwitchStatus();
+            }
+        });
+
+        switch_mute_notifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 saveSwitchStatus();
             }

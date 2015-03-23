@@ -18,8 +18,10 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -70,7 +72,17 @@ public class MainActivity extends TabActivity {
                 unmuteNotifications(getApplicationContext());
                 muteChange = !muteChange;
             }
-
+            else if (((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && isAccelerationChangedX()) && pm.isScreenOn()) {
+                if (accelerationWay() > 0) {
+                    Log.d("shake", "LEFT");
+                    GestureFunctions.startActionDecreaseVolume(getApplicationContext());
+                }
+                if (accelerationWay() < 0) {
+                    Log.d("shake", "RIGHT");
+                    GestureFunctions.startActionIncreaseVolume(getApplicationContext());
+                }
+                shakeInitialized = Calendar.getInstance();
+            }
             else if (((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && isAccelerationChanged()) && pm.isScreenOn()) {
                 Log.d("shake", "shaked");
                 SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
@@ -83,7 +95,7 @@ public class MainActivity extends TabActivity {
                 }
                 shakeInitialized = Calendar.getInstance();
             } else if ((abs(shakeInitialized.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) >= TIME_SHAKES_THRESHOLD) && (!isAccelerationChanged())) {
-                shakeInitialized = Calendar.getInstance();
+                //shakeInitialized = Calendar.getInstance();
             }
         }
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -112,6 +124,23 @@ public class MainActivity extends TabActivity {
         float deltaY = abs(yPreviousAccelerometer - yAccelerometer);
         float deltaZ = abs(zPreviousAccelerometer - zAccelerometer);
         return (deltaX > SHAKE_THRESHOLD && deltaY > SHAKE_THRESHOLD) || (deltaX > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD) || (deltaY > SHAKE_THRESHOLD && deltaZ > SHAKE_THRESHOLD);
+    }
+
+    private boolean isAccelerationChangedX() {
+        float deltaX = abs(xPreviousAccelerometer - xAccelerometer);
+        float deltaY = abs(yPreviousAccelerometer - yAccelerometer);
+        float deltaZ = abs(zPreviousAccelerometer - zAccelerometer);
+        return (deltaX > SHAKE_THRESHOLD) && (deltaY <= SHAKE_THRESHOLD && deltaZ <= SHAKE_THRESHOLD);
+    }
+
+    private float accelerationWay() {
+        float deltaX = xPreviousAccelerometer - xAccelerometer;
+        if (abs(deltaX) > SHAKE_THRESHOLD) {
+            return deltaX;
+        }
+        else {
+            return 0;
+        }
     }
 
     public void muteNotifications(Context context) {
