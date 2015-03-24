@@ -58,4 +58,17 @@
 
     <string name="not_connected">Device not connected to internet.</string>
 
+    <string name="description_geral">To use a gesture, touch the blue floating icon and then make the gesture.</string>
+    <string name="description_volume">Clockwise circle or shake to right increases volume, anticlockwise circle or shake to left decreases volume.</string>
+    <string name="description_camera">Double tap the screen to launch the camera app.</string>
+    <string name="description_voice">Make a "V" in the screen to launch voice recognition.</string>
+    <string name="description_music">Make a CLEF in the screen to launch music app.</string>
+    <string name="description_phone">Long press the screen to launch phone.</string>
+    <string name="description_message">Make a "M" in the screen to launch message app.</string>
+    <string name="description_contact">Make a heart in the screen to call your contact.</string>
+    <string name="description_navigation">Make a triangle in the screen to navigate.</string>
+    <string name="description_twitter">Make a check mark in the screen to post your localization on Twitter.</string>
+    <string name="description_mute">Put your screen faced down to mute notifications.</string>
+    <string name="description_flashlight">Shake your device to turn the flashlight on and off.</string>
+
 </resources>
