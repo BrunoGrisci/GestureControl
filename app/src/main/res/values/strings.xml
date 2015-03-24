@@ -56,4 +56,6 @@
     <string name="twitter_consumer_key">1JFx6ffVFD8GlnEeLUOwo21PG</string>
     <string name="twitter_secret_key">I3Sc6JnOB7cNHVZBRi1fJtb4AOMtUESGYIjY1Z7cHf7dxRnY3W</string>
 
+    <string name="not_connected">Device not connected to internet.</string>
+
 </resources>

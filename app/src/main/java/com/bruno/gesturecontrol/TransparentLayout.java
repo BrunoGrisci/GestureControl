@@ -14,6 +14,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -66,8 +68,8 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     static final String PREF_KEY_OAUTH_TOKEN = "oauth_token";
     static final String PREF_KEY_OAUTH_SECRET = "oauth_token_secret";
     static final String PREF_KEY_TWITTER_LOGIN = "isTwitterLogedIn";
-    //static final String TWITTER_CALLBACK_URL = "oauth://gesturecontroluob";
-    static final String TWITTER_CALLBACK_URL = "http://www.cs.bham.ac.uk/internal/modules/2014/25689/";
+    static final String TWITTER_CALLBACK_URL = "oauth://gesturecontroluob";
+    //static final String TWITTER_CALLBACK_URL = "http://example.com";
     // Twitter oauth urls
     static final String URL_TWITTER_AUTH = "auth_url";
     static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
@@ -79,6 +81,8 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
     private static SharedPreferences mSharedPreferences;
 
     private boolean GO = false;
+
+    private String address_final = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,15 +99,63 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
 
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.gestures);
         gestures.addOnGesturePerformedListener(this);
+        mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", 0);
+        address_final = mSharedPreferences.getString("final_address", "");
 
-        if (twitter == null) {
-            ConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.setOAuthConsumerKey(getResources().getString(R.string.twitter_consumer_key));
-            builder.setOAuthConsumerSecret(getResources().getString(R.string.twitter_secret_key));
-            Configuration configuration = builder.build();
-            TwitterFactory factory = new TwitterFactory(configuration);
-            twitter = factory.getInstance();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!isTwitterLoggedInAlready()) {
+                        Uri uri = getIntent().getData();
+                        if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
+                            String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
+
+                            try {
+                                Log.v("onCreate", "Receiving token: " + verifier);
+
+                                AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
+
+                                SharedPreferences.Editor e = mSharedPreferences.edit();
+
+                                e.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken());
+                                e.putString(PREF_KEY_OAUTH_SECRET, accessToken.getTokenSecret());
+                                // Store login status - true
+                                e.putBoolean(PREF_KEY_TWITTER_LOGIN, true);
+                                e.commit();
+
+                                Log.e("Twitter OAuth Token", "> " + accessToken.getToken());
+                                tweet(address_final);
+                                logoutTwitter();
+
+                            }
+                            catch (Exception e) {
+                                Log.e("Twitter Login Error", "> " + e.toString());
+                            }
+                        }
+                        else {
+                            if (uri == null) {
+                                Log.e("onCreate Twitter", "uri == null");
+                            }
+                            else {
+                                Log.e("onCreate Twitter", uri.toString());
+                            }
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+        try {
+            thread.join();
+        } catch (Exception e) {
+            Log.v("onCreate", e.toString());
         }
+
     }
 
     @Override
@@ -128,6 +180,16 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
         return super.onOptionsItemSelected(item);
     }
 
+    public boolean checkOnlineState() {
+        ConnectivityManager CManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo NInfo = CManager.getActiveNetworkInfo();
+        if (NInfo != null && NInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        return false;
+    }
+
     public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
         ArrayList<Prediction> predictions = mLibrary.recognize(gesture);
 
@@ -136,7 +198,6 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
             double score = predictions.get(0).score;
 
             if (GESTURE_CHECK_MARK.equalsIgnoreCase(result) && score > 5.0) {
-                //GestureFunctions.startActionPostTwitter(getApplicationContext());
 
                 SharedPreferences savedSwitchStatus = getSharedPreferences("saved_switch_status", MODE_PRIVATE);
                 if (savedSwitchStatus.getBoolean(getResources().getString(R.string.switch_twitter), false)) {
@@ -163,68 +224,41 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    final String address_final = getResources().getString(R.string.my_location_is) + " " + address;
+                    address_final = getResources().getString(R.string.my_location_is) + " " + address;
+
+                    mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", 0);
+                    SharedPreferences.Editor ed = mSharedPreferences.edit();
+                    ed.putString("final_address", address_final);
+                    ed.commit();
+
+                    final String addressfinal = address_final;
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), address_final, Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), addressfinal, Toast.LENGTH_LONG).show();
                         }
                     });
 
-                    loginToTwitter();
-
-                    mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-                    //if (!isTwitterLoggedInAlready()) {
-                    if (true) {
-                        Uri uri = getIntent().getData();
-                        if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
-                            // oAuth verifier
-                            String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
-                            System.out.println("AQUI");
-                            try {
-                                // Get the access token
-                                AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
-
-                                // Shared Preferences
-                                SharedPreferences.Editor e = mSharedPreferences.edit();
-
-                                // After getting access token, access token secret
-                                // store them in application preferences
-                                e.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken());
-                                e.putString(PREF_KEY_OAUTH_SECRET, accessToken.getTokenSecret());
-                                // Store login status - true
-                                e.putBoolean(PREF_KEY_TWITTER_LOGIN, true);
-                                e.commit(); // save changes
-
-                                Log.e("Twitter OAuth Token", "> " + accessToken.getToken());
-
-                                // Getting user details from twitter
-                                // For now i am getting his name only
-                                long userID = accessToken.getUserId();
-                                User user = twitter.showUser(userID);
-                                String username = user.getName();
-
-                                // Displaying in xml ui
-                                //lblUserName.setText(Html.fromHtml("<b>Welcome " + username + "</b>"));
-                            } catch (Exception e) {
-                                // Check log for login errors
-                                Log.e("Twitter Login Error", "> " + e.getMessage());
-                            }
+                    if (checkOnlineState()) {
+                        try {
+                            loginTwitter();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    }
 
-                    //
-                    try {
-                        loginTwitter();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        tweet(address_final);
+                        logoutTwitter();
                     }
-
-                    while(!GO) {
-
+                    else {
+                        Handler handler2 = new Handler(Looper.getMainLooper());
+                        handler2.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                    tweet(address_final);
 
                 }
                 else {
@@ -310,7 +344,6 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
 
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-        System.out.println("onFling: " + event1.toString() + event2.toString());
         return true;
     }
 
@@ -323,24 +356,24 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        System.out.println("onScroll: " + e1.toString() + e2.toString());
+        //System.out.println("onScroll: " + e1.toString() + e2.toString());
         return true;
     }
 
     @Override
     public void onShowPress(MotionEvent event) {
-        System.out.println("onShowPress: " + event.toString());
+        //System.out.println("onShowPress: " + event.toString());
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent event) {
-        System.out.println("onSingleTapUp: " + event.toString());
+        //System.out.println("onSingleTapUp: " + event.toString());
         return true;
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent event) {
-        System.out.println("onDoubleTap: " + event.toString());
+        //System.out.println("onDoubleTap: " + event.toString());
         return true;
     }
 
@@ -383,57 +416,6 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
         finish();
     }
 
-    private void loginToTwitter() {
-        // Check if already logged in
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //if (!isTwitterLoggedInAlready()) {
-                    if (true) {
-                        Uri uri = getIntent().getData();
-                        if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
-                            // oAuth verifier
-                            String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
-                            try {
-                                Log.v("twitter", "Receiving token: " + verifier);
-                                AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
-                                // Shared Preferences
-                                SharedPreferences.Editor e = mSharedPreferences.edit();
-                                // After getting access token, access token secret
-                                // store them in application preferences
-                                e.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken());
-                                e.putString(PREF_KEY_OAUTH_SECRET, accessToken.getTokenSecret());
-                                Log.v("login", accessToken.getToken());
-                                // Store login status - true
-                                e.putBoolean(PREF_KEY_TWITTER_LOGIN, true);
-                                e.commit(); // save changes
-
-                                Log.e("Twitter OAuth Token", "> " + accessToken.getToken());
-
-//                                Button login = (Button) findViewById(R.id.login);
-//                                login.setText("Logout");
-
-                            } catch (Exception e) {
-                                // Check log for login errors
-                                Log.e("Twitter Login Error", "> " + e.toString());
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
-        try {
-            thread.join();
-        } catch (Exception e) {
-            Log.v("twi", e.toString());
-        }
-    }
-
     public void loginTwitter() throws Exception {
 
         Thread thread = new Thread(new Runnable() {
@@ -456,11 +438,13 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
             }
         });
         thread.start();
         try {
             thread.join();
+            GO = true;
         } catch (Exception e) {
             Log.v("twi", e.toString());
         }
@@ -473,6 +457,7 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
             public void run() {
                 try {
                     //Your Twitter Access Token
+                    mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
                     String accessToken = mSharedPreferences.getString(PREF_KEY_OAUTH_TOKEN, "");
                     //Your Twitter Access Token Secret
                     String accessTokenSecret = mSharedPreferences.getString(PREF_KEY_OAUTH_SECRET, "");
@@ -516,8 +501,16 @@ public class TransparentLayout extends ActionBarActivity implements GestureOverl
         }
     }
 
+    private void logoutTwitter() {
+        SharedPreferences.Editor e = mSharedPreferences.edit();
+        e.putString(PREF_KEY_OAUTH_TOKEN, "");
+        e.putString(PREF_KEY_OAUTH_SECRET, "");
+        e.putBoolean(PREF_KEY_TWITTER_LOGIN, false);
+        e.commit();
+
+    }
+
     private boolean isTwitterLoggedInAlready() {
-        // return twitter login status from Shared Preferences
         mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
     }

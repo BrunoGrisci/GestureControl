@@ -12,6 +12,7 @@ import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -54,6 +55,7 @@ public class MainActivity extends TabActivity {
     private Calendar shakeInitialized = Calendar.getInstance();
 
     private boolean muteChange = true;
+    static final String TWITTER_CALLBACK_URL = "oauth://gesturecontroluob";
 
     public static boolean isCameraOn = false;
     static Camera cam = Camera.open();
@@ -172,6 +174,15 @@ public class MainActivity extends TabActivity {
         mTabHost.addTab(mTabHost.newTabSpec("first").setIndicator("Gesture activation").setContent(new Intent(this, GestureActivation.class )));
         mTabHost.addTab(mTabHost.newTabSpec("second").setIndicator("Commands").setContent(new Intent(this, Commands.class )));
         mTabHost.setCurrentTab(0);
+
+        Uri uri = getIntent().getData();
+        if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
+            Intent intent = new Intent(getApplicationContext(), TransparentLayout.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("item", 5);
+            intent.setData(uri);
+            startActivity(intent);
+        }
 
         Intent i= new Intent(getApplicationContext(), FloatingButtonService.class);
         getApplicationContext().startService(i);
