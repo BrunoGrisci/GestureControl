@@ -123,7 +123,7 @@ public class Commands extends ActionBarActivity {
 
         button_twitter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                GestureFunctions.startActionPostTwitter(getApplicationContext());
+                Toast.makeText(getApplicationContext(), "Please use the check mark gesture.", Toast.LENGTH_SHORT).show();
             }
         });
 
