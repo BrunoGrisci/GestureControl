@@ -47,6 +47,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".GestureActivation"
@@ -55,6 +56,14 @@
         <activity
             android:name=".Commands"
             android:label="@string/title_activity_commands" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="oauth" android:host="http://www.cs.bham.ac.uk/internal/modules/2014/25689/"/>
+            </intent-filter>
+
         </activity>
 
         <service android:name=".FloatingButtonService" />
@@ -68,6 +77,14 @@
             android:label="@string/title_activity_transparent_layout"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.AppCompat.NoActionBar.Translucent" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="oauth" android:host="http://www.cs.bham.ac.uk/internal/modules/2014/25689/"/>
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".LocationSelector"
